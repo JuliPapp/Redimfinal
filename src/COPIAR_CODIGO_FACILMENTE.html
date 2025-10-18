@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Copiar Código para Desplegar</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1e40af;
+            margin-top: 0;
+        }
+        .step {
+            background: #f0f9ff;
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .step h3 {
+            margin-top: 0;
+            color: #1e40af;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #2563eb;
+        }
+        button:active {
+            background: #1d4ed8;
+        }
+        .success {
+            background: #10b981;
+        }
+        .success:hover {
+            background: #059669;
+        }
+        .url {
+            background: #ffe4e6;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 10px 0;
+        }
+        .code-preview {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow: auto;
+            margin: 10px 0;
+        }
+        .alert {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Copiar Código para Desplegar en Supabase</h1>
+        
+        <div class="alert">
+            <strong>⚠️ IMPORTANTE:</strong> Este es el código CORRECTO de 2802 líneas que necesitas desplegar en Supabase.
+        </div>
+
+        <div class="step">
+            <h3>PASO 1: Abrir Supabase</h3>
+            <p>Haz clic aquí para abrir el dashboard de Supabase:</p>
+            <button onclick="window.open('https://supabase.com/dashboard/project/jxvikpmfcpzyjjksmhnd/functions', '_blank')">
+                📂 Abrir Supabase Dashboard
+            </button>
+            <p style="margin-top:10px; font-size:14px; color:#666;">
+                Busca la función: <strong>make-server-636f4a29</strong> → Haz clic en "Edit"
+            </p>
+        </div>
+
+        <div class="step">
+            <h3>PASO 2: Verificar que el código se copió</h3>
+            <p>El código correcto empieza así:</p>
+            <div class="code-preview">
+import { Hono } from 'npm:hono';
+import { cors } from 'npm:hono/cors';
+import { logger } from 'npm:hono/logger';
+import { createClient } from 'jsr:@supabase/supabase-js@2';
+...
+            </div>
+            <p>Y en la línea ~151 debe decir:</p>
+            <div class="code-preview">
+app.get('/auth/profile', async (c) => {
+            </div>
+            <p style="color:#ef4444; font-weight:600;">❌ NO debe decir: <code>/make-server-636f4a29/auth/profile</code></p>
+            <p style="color:#10b981; font-weight:600;">✅ Debe decir: <code>/auth/profile</code></p>
+        </div>
+
+        <div class="step">
+            <h3>PASO 3: En Figma Make</h3>
+            <ol>
+                <li>Abre el archivo: <code>/supabase/functions/server/index.tsx</code></li>
+                <li>Selecciona TODO: <strong>Ctrl + A</strong> (o Cmd + A en Mac)</li>
+                <li>Copia: <strong>Ctrl + C</strong> (o Cmd + C en Mac)</li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <h3>PASO 4: En Supabase Dashboard</h3>
+            <ol>
+                <li>En el editor de la función <code>make-server-636f4a29</code></li>
+                <li>Selecciona TODO el código viejo: <strong>Ctrl + A</strong></li>
+                <li>Borra: <strong>Delete</strong></li>
+                <li>Pega el código nuevo: <strong>Ctrl + V</strong></li>
+                <li>Haz clic en: <strong>"Deploy"</strong></li>
+                <li>Espera 1-2 minutos...</li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <h3>PASO 5: Verificar que funcionó</h3>
+            <p>Haz clic aquí para verificar el endpoint de salud:</p>
+            <button class="success" onclick="window.open('https://jxvikpmfcpzyjjksmhnd.supabase.co/functions/v1/make-server-636f4a29/health', '_blank')">
+                🩺 Verificar /health
+            </button>
+            <p style="margin-top:10px; font-size:14px; color:#666;">
+                Deberías ver: <code>{"status":"ok","message":"Server is healthy",...}</code>
+            </p>
+        </div>
+
+        <div class="alert" style="background:#dcfce7; border-color:#22c55e;">
+            <strong>✅ Si ves el mensaje de salud:</strong> ¡El código se desplegó correctamente!<br>
+            Recarga tu app en Figma Make (F5) y haz login.
+        </div>
+
+        <div class="alert" style="background:#fee2e2; border-color:#ef4444;">
+            <strong>❌ Si ves error 404:</strong> El código NO se desplegó correctamente.<br>
+            Repite el PASO 4 con más cuidado, asegurándote de copiar TODO el código.
+        </div>
+    </div>
+
+    <script>
+        console.log('%c🚀 INSTRUCCIONES PARA DESPLEGAR', 'background:#3b82f6;color:white;font-size:20px;padding:10px');
+        console.log('%c1. Abre Supabase Dashboard', 'font-size:14px;color:#3b82f6');
+        console.log('%c2. Edita la función make-server-636f4a29', 'font-size:14px;color:#3b82f6');
+        console.log('%c3. Copia TODO el código de /supabase/functions/server/index.tsx', 'font-size:14px;color:#3b82f6');
+        console.log('%c4. Pega en Supabase y Deploy', 'font-size:14px;color:#3b82f6');
+        console.log('%c5. Verifica /health', 'font-size:14px;color:#3b82f6');
+    </script>
+</body>
+</html>
