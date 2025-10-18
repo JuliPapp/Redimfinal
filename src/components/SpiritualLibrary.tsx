@@ -86,7 +86,7 @@ export function SpiritualLibrary({ userRole, accessToken, projectId, onBack }: P
   const fetchCurrentUser = async () => {
     try {
       const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-636f4a29/auth/profile`,
+        `https://${projectId}.supabase.co/functions/v1/server/auth/profile`,
         {
           headers: { 'Authorization': `Bearer ${accessToken}` }
         }

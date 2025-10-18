@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía Visual de Despliegue</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        .progress-bar {
+            background: rgba(255,255,255,0.2);
+            height: 8px;
+            border-radius: 10px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            background: white;
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        .content {
+            padding: 40px;
+        }
+        .step {
+            margin-bottom: 30px;
+            padding: 25px;
+            border: 3px solid #e2e8f0;
+            border-radius: 15px;
+            transition: all 0.3s;
+            position: relative;
+        }
+        .step.active {
+            border-color: #667eea;
+            background: #f8f9ff;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
+        }
+        .step.completed {
+            border-color: #22c55e;
+            background: #f0fdf4;
+        }
+        .step-number {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            background: #667eea;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        .step.completed .step-number {
+            background: #22c55e;
+        }
+        .step.completed .step-number::after {
+            content: '✓';
+        }
+        .step-title {
+            font-size: 1.5rem;
+            color: #1a202c;
+            margin: 0 0 15px 0;
+            padding-left: 50px;
+        }
+        .step-description {
+            color: #4a5568;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        .step-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        button.secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        button.success {
+            background: #22c55e;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+        }
+        .code-box {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        .url-box {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            padding: 12px 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            margin: 10px 0;
+            word-break: break-all;
+        }
+        .alert {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .alert.error {
+            background: #fee2e2;
+            border-left-color: #ef4444;
+        }
+        .alert.success {
+            background: #dcfce7;
+            border-left-color: #22c55e;
+        }
+        .kbd {
+            background: #e2e8f0;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9em;
+            border: 1px solid #cbd5e0;
+        }
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+        .checklist li {
+            padding: 10px;
+            margin: 5px 0;
+            background: #f8fafc;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .checklist li:hover {
+            background: #e2e8f0;
+        }
+        .checklist li.checked {
+            background: #dcfce7;
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+        .checklist li::before {
+            content: '☐';
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+        .checklist li.checked::before {
+            content: '☑';
+            color: #22c55e;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Guía de Despliegue</h1>
+            <p>Paso a paso para actualizar el código en Supabase</p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress"></div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="alert">
+                <strong>🎯 Objetivo:</strong> Copiar el código correcto de Figma Make a Supabase para que el login funcione.
+            </div>
+
+            <!-- Paso 1 -->
+            <div class="step active" id="step1">
+                <div class="step-number">1</div>
+                <h2 class="step-title">Copiar el código en Figma Make</h2>
+                <p class="step-description">
+                    Necesitas copiar el archivo completo <code>/supabase/functions/server/index.tsx</code> que tiene 2802 líneas de código correcto.
+                </p>
+                <ul class="checklist">
+                    <li onclick="toggleCheck(this)">Abrir Figma Make</li>
+                    <li onclick="toggleCheck(this)">Buscar archivo: <code>/supabase/functions/server/index.tsx</code></li>
+                    <li onclick="toggleCheck(this)">Hacer clic en el archivo para abrirlo</li>
+                    <li onclick="toggleCheck(this)">Presionar <span class="kbd">Ctrl + A</span> (seleccionar todo)</li>
+                    <li onclick="toggleCheck(this)">Presionar <span class="kbd">Ctrl + C</span> (copiar)</li>
+                </ul>
+                <div class="step-actions">
+                    <button onclick="completeStep(1)">✓ Completé este paso</button>
+                </div>
+            </div>
+
+            <!-- Paso 2 -->
+            <div class="step" id="step2">
+                <div class="step-number">2</div>
+                <h2 class="step-title">Abrir Supabase Dashboard</h2>
+                <p class="step-description">
+                    Abre el panel de administración de Supabase donde están las Edge Functions.
+                </p>
+                <div class="url-box">
+                    https://supabase.com/dashboard/project/jxvikpmfcpzyjjksmhnd/functions
+                </div>
+                <div class="step-actions">
+                    <button onclick="window.open('https://supabase.com/dashboard/project/jxvikpmfcpzyjjksmhnd/functions', '_blank')">
+                        🔗 Abrir Supabase Dashboard
+                    </button>
+                    <button class="secondary" onclick="completeStep(2)">✓ Ya lo abrí</button>
+                </div>
+            </div>
+
+            <!-- Paso 3 -->
+            <div class="step" id="step3">
+                <div class="step-number">3</div>
+                <h2 class="step-title">Encontrar la función</h2>
+                <p class="step-description">
+                    Busca la función llamada <strong>make-server-636f4a29</strong> en la lista de Edge Functions.
+                </p>
+                <ul class="checklist">
+                    <li onclick="toggleCheck(this)">Veo la lista de Edge Functions</li>
+                    <li onclick="toggleCheck(this)">Encontré: <code>make-server-636f4a29</code></li>
+                    <li onclick="toggleCheck(this)">Hice clic en la función</li>
+                    <li onclick="toggleCheck(this)">Se abrió la página de detalles</li>
+                </ul>
+                <div class="step-actions">
+                    <button class="secondary" onclick="completeStep(3)">✓ Encontré la función</button>
+                </div>
+            </div>
+
+            <!-- Paso 4 -->
+            <div class="step" id="step4">
+                <div class="step-number">4</div>
+                <h2 class="step-title">Editar el código</h2>
+                <p class="step-description">
+                    Busca el botón "Edit" para abrir el editor de código de la función.
+                </p>
+                <ul class="checklist">
+                    <li onclick="toggleCheck(this)">Encontré el botón "Edit" (arriba a la derecha)</li>
+                    <li onclick="toggleCheck(this)">Hice clic en "Edit"</li>
+                    <li onclick="toggleCheck(this)">Se abrió el editor de código</li>
+                    <li onclick="toggleCheck(this)">Veo el código actual (viejo)</li>
+                </ul>
+                <div class="alert error" style="font-size:0.9em;">
+                    <strong>⚠️ Nota:</strong> Si no ves "Edit", busca "Edit function", "Edit code", "Modify", o un ícono de lápiz ✏️
+                </div>
+                <div class="step-actions">
+                    <button class="secondary" onclick="completeStep(4)">✓ Abrí el editor</button>
+                </div>
+            </div>
+
+            <!-- Paso 5 -->
+            <div class="step" id="step5">
+                <div class="step-number">5</div>
+                <h2 class="step-title">Reemplazar el código</h2>
+                <p class="step-description">
+                    Borra el código viejo y pega el nuevo que copiaste en el Paso 1.
+                </p>
+                <ul class="checklist">
+                    <li onclick="toggleCheck(this)">Presionar <span class="kbd">Ctrl + A</span> (seleccionar todo)</li>
+                    <li onclick="toggleCheck(this)">Presionar <span class="kbd">Delete</span> (borrar)</li>
+                    <li onclick="toggleCheck(this)">Presionar <span class="kbd">Ctrl + V</span> (pegar código nuevo)</li>
+                    <li onclick="toggleCheck(this)">Verificar línea ~151 dice: <code>app.get('/auth/profile'</code></li>
+                </ul>
+                <div class="alert">
+                    <strong>✅ Verificación importante:</strong><br>
+                    La línea ~151 debe decir: <code>/auth/profile</code><br>
+                    <strong>NO</strong> debe decir: <code>/make-server-636f4a29/auth/profile</code>
+                </div>
+                <div class="step-actions">
+                    <button class="secondary" onclick="completeStep(5)">✓ Pegué el código</button>
+                </div>
+            </div>
+
+            <!-- Paso 6 -->
+            <div class="step" id="step6">
+                <div class="step-number">6</div>
+                <h2 class="step-title">Desplegar</h2>
+                <p class="step-description">
+                    Guarda y despliega el código actualizado. Esto puede tardar 1-2 minutos.
+                </p>
+                <ul class="checklist">
+                    <li onclick="toggleCheck(this)">Encontré el botón "Deploy"</li>
+                    <li onclick="toggleCheck(this)">Hice clic en "Deploy"</li>
+                    <li onclick="toggleCheck(this)">Vi mensaje "Deploying..."</li>
+                    <li onclick="toggleCheck(this)">Esperé 1-2 minutos ⏱️</li>
+                    <li onclick="toggleCheck(this)">Vi mensaje "Successfully deployed" ✅</li>
+                </ul>
+                <div class="step-actions">
+                    <button class="secondary" onclick="completeStep(6)">✓ Desplegué exitosamente</button>
+                </div>
+            </div>
+
+            <!-- Paso 7 -->
+            <div class="step" id="step7">
+                <div class="step-number">7</div>
+                <h2 class="step-title">Verificar</h2>
+                <p class="step-description">
+                    Prueba que el servidor esté funcionando correctamente con el endpoint de salud.
+                </p>
+                <div class="url-box">
+                    https://jxvikpmfcpzyjjksmhnd.supabase.co/functions/v1/make-server-636f4a29/health
+                </div>
+                <div class="alert success">
+                    <strong>✅ Respuesta correcta:</strong><br>
+                    <code>{"status":"ok","message":"Server is healthy","timestamp":"..."}</code>
+                </div>
+                <div class="alert error">
+                    <strong>❌ Si ves error 404:</strong><br>
+                    El código NO se desplegó correctamente. Vuelve al Paso 5 y asegúrate de copiar TODO el código (2802 líneas).
+                </div>
+                <div class="step-actions">
+                    <button onclick="window.open('https://jxvikpmfcpzyjjksmhnd.supabase.co/functions/v1/make-server-636f4a29/health', '_blank')">
+                        🩺 Abrir /health
+                    </button>
+                    <button class="secondary" onclick="completeStep(7)">✓ Funciona correctamente</button>
+                </div>
+            </div>
+
+            <!-- Paso 8 -->
+            <div class="step" id="step8">
+                <div class="step-number">8</div>
+                <h2 class="step-title">Probar la app</h2>
+                <p class="step-description">
+                    Vuelve a tu aplicación en Figma Make y prueba el login.
+                </p>
+                <ul class="checklist">
+                    <li onclick="toggleCheck(this)">Volví a Figma Make</li>
+                    <li onclick="toggleCheck(this)">Recargué la página: <span class="kbd">F5</span></li>
+                    <li onclick="toggleCheck(this)">Ingresé email: <code>admin@test.com</code></li>
+                    <li onclick="toggleCheck(this)">Ingresé password: <code>30093009</code></li>
+                    <li onclick="toggleCheck(this)">Hice clic en "Iniciar Sesión"</li>
+                    <li onclick="toggleCheck(this)">¡Login exitoso! 🎉</li>
+                </ul>
+                <div class="alert success">
+                    <strong>🎉 ¡FELICIDADES!</strong><br>
+                    Has desplegado exitosamente el código. La aplicación ahora funciona correctamente.
+                </div>
+                <div class="step-actions">
+                    <button class="success" onclick="completeStep(8)">🎉 ¡COMPLETADO!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 8;
+
+        function toggleCheck(element) {
+            element.classList.toggle('checked');
+        }
+
+        function completeStep(stepNumber) {
+            const step = document.getElementById(`step${stepNumber}`);
+            step.classList.remove('active');
+            step.classList.add('completed');
+            
+            if (stepNumber < totalSteps) {
+                const nextStep = document.getElementById(`step${stepNumber + 1}`);
+                nextStep.classList.add('active');
+                currentStep = stepNumber + 1;
+                
+                // Scroll to next step
+                nextStep.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const progress = (currentStep / totalSteps) * 100;
+            document.getElementById('progress').style.width = progress + '%';
+        }
+
+        // Initialize
+        updateProgress();
+    </script>
+</body>
+</html>

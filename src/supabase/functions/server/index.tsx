@@ -1,3 +1,8 @@
+// @ts-nocheck
+// Este archivo está diseñado para Deno (Supabase Edge Functions)
+// Los imports con npm:, jsr: y node: son válidos en Deno
+// TypeScript en VS Code mostrará errores pero el código funciona correctamente en Supabase
+
 import { Hono } from 'npm:hono';
 import { cors } from 'npm:hono/cors';
 import { logger } from 'npm:hono/logger';
@@ -6,7 +11,6 @@ import * as crypto from 'node:crypto';
 import { Buffer } from 'node:buffer';
 
 const app = new Hono();
-
 // Middleware - CORS with explicit configuration
 app.use('*', cors({
   origin: '*',

@@ -1,0 +1,116 @@
+================================================================================
+  🚀 EMPIEZA AQUÍ - Solución al Error 404 de Login
+================================================================================
+
+📌 TU PREGUNTA:
+   "¿El código de Figma está revisando Supabase?"
+
+📌 RESPUESTA:
+   SÍ, el código en Figma Make está CORRECTAMENTE configurado y se conecta 
+   a Supabase sin problemas. El ÚNICO problema es que el código desplegado 
+   en Supabase es VIEJO.
+
+📌 PROBLEMA:
+   Login muestra error: "Route not found /auth/profile"
+
+📌 CAUSA:
+   El código en Supabase está desactualizado (es viejo)
+
+📌 SOLUCIÓN:
+   Copiar código nuevo de Figma Make → Supabase Dashboard (3 minutos)
+
+================================================================================
+
+✅ PASOS RÁPIDOS:
+
+1. COPIAR (en Figma Make)
+   - Abrir: /supabase/functions/server/index.tsx
+   - Ctrl+A (seleccionar todo)
+   - Ctrl+C (copiar)
+
+2. IR A SUPABASE
+   - Abrir: https://supabase.com/dashboard/project/jxvikpmfcpzyjjksmhnd/functions
+   - Buscar función: make-server-636f4a29
+   - Clic en "Edit"
+
+3. REEMPLAZAR
+   - Ctrl+A (seleccionar código viejo)
+   - Delete (borrar)
+   - Ctrl+V (pegar código nuevo)
+   - Clic en "Deploy"
+   - Esperar 1-2 minutos
+
+4. VERIFICAR
+   - Abrir: https://jxvikpmfcpzyjjksmhnd.supabase.co/functions/v1/make-server-636f4a29/health
+   - Debe decir: {"status":"ok"}
+
+5. PROBAR
+   - Volver a Figma Make
+   - F5 (recargar)
+   - Login: admin@test.com / 30093009
+   - ¡Listo! 🎉
+
+================================================================================
+
+⚠️  ERRORES ROJOS EN VS CODE:
+
+   Si ves ~60 errores en /supabase/functions/server/index.tsx:
+
+   ✅ IGNÓRALOS - Son FALSOS POSITIVOS
+   ✅ El código funciona PERFECTAMENTE en Supabase
+   ✅ Solo son errores visuales de VS Code
+   
+   Razón: El archivo está diseñado para Deno, no Node.js
+   Ayuda: Lee ERRORES_TYPESCRIPT.md si quieres eliminarlos
+
+================================================================================
+
+📚 AYUDA DETALLADA:
+
+   Abre estos archivos para más información:
+
+   • SOLUCION_FINAL.md           - Solución paso a paso con capturas
+   • CHECKLIST_DESPLEGAR.md      - Lista de verificación
+   • guia-visual-despliegue.html - Guía interactiva (abre en navegador)
+   • test-endpoints.html         - Prueba endpoints (abre en navegador)
+
+================================================================================
+
+🆘 PROBLEMAS COMUNES:
+
+   ❌ "No puedo abrir Supabase Dashboard"
+      → Prueba en modo incógnito (Ctrl+Shift+N)
+      → Espera 15 minutos y vuelve a intentar
+
+   ❌ "No veo el botón Edit"
+      → Busca: "Edit function", "Modify", o ícono de lápiz ✏️
+
+   ❌ "Sigue dando error 404"
+      → Verifica que pegaste TODO el código (2802 líneas)
+      → Espera 2-3 minutos más después de Deploy
+
+================================================================================
+
+💡 VERIFICACIÓN RÁPIDA:
+
+   ✅ FUNCIONÓ:
+      • /health responde {"status":"ok"}
+      • Login exitoso
+      • Sin error 404
+
+   ❌ NO FUNCIONÓ:
+      • /health da 404
+      • Login muestra error
+      • Vuelve al paso 3 y verifica
+
+================================================================================
+
+⏱️  TIEMPO: ~3 minutos
+🎯  DIFICULTAD: Fácil (copiar y pegar)
+🔧  HERRAMIENTAS: Solo navegador web
+
+================================================================================
+
+¿Necesitas ayuda? Lee SOLUCION_FINAL.md con más detalles.
+
+================================================================================

@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "lib": ["deno.window"],
+    "strict": true,
+    "noImplicitAny": false
+  },
+  "imports": {
+    "hono": "npm:hono",
+    "hono/cors": "npm:hono/cors",
+    "hono/logger": "npm:hono/logger",
+    "@supabase/supabase-js": "jsr:@supabase/supabase-js@2"
+  },
+  "lint": {
+    "files": {
+      "exclude": ["node_modules/"]
+    }
+  },
+  "fmt": {
+    "files": {
+      "exclude": ["node_modules/"]
+    }
+  }
+}

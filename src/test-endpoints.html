@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Endpoints - Camino de Restauración</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        .content {
+            padding: 30px;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+        .test-section:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+        }
+        .test-section h2 {
+            color: #1a202c;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        .test-section p {
+            color: #4a5568;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .result.success {
+            background: #f0fdf4;
+            border: 2px solid #22c55e;
+            color: #166534;
+        }
+        .result.error {
+            background: #fef2f2;
+            border: 2px solid #ef4444;
+            color: #991b1b;
+        }
+        .result.loading {
+            background: #eff6ff;
+            border: 2px solid #3b82f6;
+            color: #1e40af;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        .status-badge.success {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .status-badge.error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .url-display {
+            background: #f8fafc;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: #475569;
+            margin: 10px 0;
+            word-break: break-all;
+        }
+        .alert {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+        .alert strong {
+            color: #92400e;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .alert p {
+            color: #78350f;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🩺 Test de Endpoints</h1>
+            <p>Verificación del servidor Edge Function</p>
+        </div>
+        
+        <div class="content">
+            <div class="alert">
+                <strong>⚠️ Importante:</strong>
+                <p>Primero verifica el endpoint de salud (/health). Si da error 404, necesitas redesplegar el código.</p>
+            </div>
+
+            <!-- Test 1: Health Check -->
+            <div class="test-section">
+                <h2>1️⃣ Health Check <span id="health-status" class="status-badge" style="display:none;"></span></h2>
+                <p>Verifica que el servidor esté funcionando correctamente.</p>
+                <div class="url-display">GET /health</div>
+                <button onclick="testHealth()">▶ Probar /health</button>
+                <div id="health-result"></div>
+            </div>
+
+            <!-- Test 2: Root Endpoint -->
+            <div class="test-section">
+                <h2>2️⃣ Root Endpoint <span id="root-status" class="status-badge" style="display:none;"></span></h2>
+                <p>Verifica el endpoint raíz del servidor.</p>
+                <div class="url-display">GET /</div>
+                <button onclick="testRoot()">▶ Probar /</button>
+                <div id="root-result"></div>
+            </div>
+
+            <!-- Test 3: Profile (requiere auth) -->
+            <div class="test-section">
+                <h2>3️⃣ Profile Endpoint <span id="profile-status" class="status-badge" style="display:none;"></span></h2>
+                <p>Verifica el endpoint de perfil (debe dar error 401 sin autenticación).</p>
+                <div class="url-display">GET /auth/profile</div>
+                <button onclick="testProfile()">▶ Probar /auth/profile</button>
+                <div id="profile-result"></div>
+            </div>
+
+            <!-- Test 4: Full Login Flow -->
+            <div class="test-section">
+                <h2>4️⃣ Test de Login Completo <span id="login-status" class="status-badge" style="display:none;"></span></h2>
+                <p>Prueba el flujo completo de login con credenciales de admin.</p>
+                <div class="url-display">Email: admin@test.com | Password: 30093009</div>
+                <button onclick="testLogin()">▶ Probar Login</button>
+                <div id="login-result"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const BASE_URL = 'https://jxvikpmfcpzyjjksmhnd.supabase.co/functions/v1/make-server-636f4a29';
+
+        function showResult(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.className = `result ${type}`;
+            element.textContent = message;
+            element.style.display = 'block';
+        }
+
+        function updateStatus(statusId, success) {
+            const status = document.getElementById(statusId);
+            status.style.display = 'inline-block';
+            status.className = `status-badge ${success ? 'success' : 'error'}`;
+            status.textContent = success ? '✓ OK' : '✗ Error';
+        }
+
+        async function testHealth() {
+            const resultId = 'health-result';
+            showResult(resultId, '⏳ Probando /health...', 'loading');
+            
+            try {
+                const response = await fetch(`${BASE_URL}/health`);
+                const data = await response.json();
+                
+                if (response.ok && data.status === 'ok') {
+                    showResult(resultId, `✅ SUCCESS (${response.status})\n\n${JSON.stringify(data, null, 2)}`, 'success');
+                    updateStatus('health-status', true);
+                } else {
+                    showResult(resultId, `❌ ERROR (${response.status})\n\n${JSON.stringify(data, null, 2)}`, 'error');
+                    updateStatus('health-status', false);
+                }
+            } catch (error) {
+                showResult(resultId, `❌ ERROR DE RED\n\n${error.message}\n\n🚨 POSIBLES CAUSAS:\n1. El código NO está desplegado en Supabase\n2. La función no existe o tiene otro nombre\n3. Problema de conectividad`, 'error');
+                updateStatus('health-status', false);
+            }
+        }
+
+        async function testRoot() {
+            const resultId = 'root-result';
+            showResult(resultId, '⏳ Probando /...', 'loading');
+            
+            try {
+                const response = await fetch(`${BASE_URL}/`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult(resultId, `✅ SUCCESS (${response.status})\n\n${JSON.stringify(data, null, 2)}`, 'success');
+                    updateStatus('root-status', true);
+                } else {
+                    showResult(resultId, `❌ ERROR (${response.status})\n\n${JSON.stringify(data, null, 2)}`, 'error');
+                    updateStatus('root-status', false);
+                }
+            } catch (error) {
+                showResult(resultId, `❌ ERROR DE RED\n\n${error.message}`, 'error');
+                updateStatus('root-status', false);
+            }
+        }
+
+        async function testProfile() {
+            const resultId = 'profile-result';
+            showResult(resultId, '⏳ Probando /auth/profile...', 'loading');
+            
+            try {
+                const response = await fetch(`${BASE_URL}/auth/profile`, {
+                    headers: {
+                        'Authorization': 'Bearer invalid-token'
+                    }
+                });
+                const data = await response.json();
+                
+                if (response.status === 401) {
+                    showResult(resultId, `✅ CORRECTO (${response.status})\n\nEl endpoint existe y rechaza tokens inválidos correctamente.\n\n${JSON.stringify(data, null, 2)}`, 'success');
+                    updateStatus('profile-status', true);
+                } else if (response.status === 404) {
+                    showResult(resultId, `❌ ERROR 404\n\n🚨 El endpoint NO existe.\n\nESTO SIGNIFICA: El código en Supabase es VIEJO.\n\n${JSON.stringify(data, null, 2)}\n\n📋 SOLUCIÓN:\n1. Copia /supabase/functions/server/index.tsx\n2. Pega en Supabase Dashboard\n3. Deploy`, 'error');
+                    updateStatus('profile-status', false);
+                } else {
+                    showResult(resultId, `⚠️ RESPUESTA INESPERADA (${response.status})\n\n${JSON.stringify(data, null, 2)}`, 'error');
+                    updateStatus('profile-status', false);
+                }
+            } catch (error) {
+                showResult(resultId, `❌ ERROR DE RED\n\n${error.message}`, 'error');
+                updateStatus('profile-status', false);
+            }
+        }
+
+        async function testLogin() {
+            const resultId = 'login-result';
+            showResult(resultId, '⏳ Probando login completo...', 'loading');
+            
+            try {
+                // Step 1: Login with Supabase Auth
+                showResult(resultId, '⏳ Paso 1: Autenticando con Supabase...', 'loading');
+                
+                const loginResponse = await fetch('https://jxvikpmfcpzyjjksmhnd.supabase.co/auth/v1/token?grant_type=password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4dmlrcG1mY3B6eWpqa3NtaG5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjg4NTM4MTMsImV4cCI6MjA0NDQyOTgxM30.FPB5vNjmCmhmq2oFrOvfv3pJcTBLPQCIwDWM1vwOOp0'
+                    },
+                    body: JSON.stringify({
+                        email: 'admin@test.com',
+                        password: '30093009'
+                    })
+                });
+                
+                if (!loginResponse.ok) {
+                    const errorData = await loginResponse.json();
+                    showResult(resultId, `❌ ERROR EN LOGIN (${loginResponse.status})\n\n${JSON.stringify(errorData, null, 2)}\n\n🔍 POSIBLES CAUSAS:\n1. Email o password incorrectos\n2. Usuario no existe\n3. Revisa que el admin esté creado en Supabase Auth`, 'error');
+                    updateStatus('login-status', false);
+                    return;
+                }
+                
+                const authData = await loginResponse.json();
+                const accessToken = authData.access_token;
+                
+                // Step 2: Get profile
+                showResult(resultId, '⏳ Paso 2: Obteniendo perfil...', 'loading');
+                
+                const profileResponse = await fetch(`${BASE_URL}/auth/profile`, {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+                
+                const profileData = await profileResponse.json();
+                
+                if (profileResponse.ok && profileData.profile) {
+                    showResult(resultId, `✅ LOGIN EXITOSO!\n\nPERFIL:\n${JSON.stringify(profileData.profile, null, 2)}\n\n🎉 El servidor está funcionando correctamente!`, 'success');
+                    updateStatus('login-status', true);
+                } else if (profileResponse.status === 404) {
+                    showResult(resultId, `❌ ERROR 404 EN /auth/profile\n\n🚨 El código en Supabase es VIEJO.\n\nLogin funcionó, pero el endpoint /auth/profile no existe.\n\n${JSON.stringify(profileData, null, 2)}\n\n📋 SOLUCIÓN:\n1. Copia /supabase/functions/server/index.tsx en Figma Make\n2. Pega en Supabase Dashboard\n3. Deploy\n4. Recarga esta página y prueba de nuevo`, 'error');
+                    updateStatus('login-status', false);
+                } else {
+                    showResult(resultId, `❌ ERROR AL OBTENER PERFIL (${profileResponse.status})\n\n${JSON.stringify(profileData, null, 2)}`, 'error');
+                    updateStatus('login-status', false);
+                }
+            } catch (error) {
+                showResult(resultId, `❌ ERROR\n\n${error.message}\n\nStack:\n${error.stack}`, 'error');
+                updateStatus('login-status', false);
+            }
+        }
+
+        // Auto-test health on load
+        window.addEventListener('load', () => {
+            console.log('%c🩺 Test de Endpoints - Camino de Restauración', 'background:#667eea;color:white;font-size:20px;padding:10px;border-radius:5px;');
+            console.log('Base URL:', BASE_URL);
+            setTimeout(testHealth, 500);
+        });
+    </script>
+</body>
+</html>

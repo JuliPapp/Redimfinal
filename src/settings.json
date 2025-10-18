@@ -1,0 +1,20 @@
+{
+  "deno.enable": false,
+  "deno.enablePaths": [
+    "./supabase/functions"
+  ],
+  "typescript.validate.enable": true,
+  "files.exclude": {},
+  "[typescript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "typescript.tsdk": "node_modules/typescript/lib",
+  
+  // Configuración específica para archivos de Supabase Edge Functions
+  "files.associations": {
+    "**/supabase/functions/**/*.tsx": "typescript"
+  },
+  
+  // Mensaje informativo sobre errores en archivos de Deno
+  "problems.decorations.enabled": true
+}

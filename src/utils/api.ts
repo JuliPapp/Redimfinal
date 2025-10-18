@@ -1,7 +1,8 @@
 import { projectId } from './supabase/info';
 
 // Base URL para el servidor Edge Function
-const BASE_URL = `https://${projectId}.supabase.co/functions/v1/make-server-636f4a29`;
+const BASE_URL = `https://${projectId}.supabase.co/functions/v1/server`;
+
 
 // Helper para construir URLs de API
 export function getApiUrl(path: string): string {
