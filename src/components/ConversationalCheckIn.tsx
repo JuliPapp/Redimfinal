@@ -5,6 +5,7 @@ import { Badge } from './ui/badge';
 import { Alert, AlertDescription } from './ui/alert';
 import { Loader2, Send, Sparkles, CheckCircle2, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner@2.0.3';
+import { API_URLS } from '../utils/api';
 
 type Message = {
   role: 'user' | 'assistant';
@@ -64,7 +65,7 @@ export function ConversationalCheckIn({ accessToken, projectId, onComplete, onBa
       console.log('=== STARTING CONVERSATION ===');
       console.log('Project ID:', projectId);
       
-      const url = `https://${projectId}.supabase.co/functions/v1/make-server-636f4a29/checkin/start-conversation`;
+      const url = API_URLS.startConversation();
       console.log('Calling:', url);
       
       const response = await fetch(url, {
@@ -153,7 +154,7 @@ export function ConversationalCheckIn({ accessToken, projectId, onComplete, onBa
     setIsLoading(true);
 
     try {
-      const url = `https://${projectId}.supabase.co/functions/v1/make-server-636f4a29/checkin/conversation/${conversationId}`;
+      const url = API_URLS.sendMessage(conversationId!);
       console.log('Sending message to:', url);
       
       const response = await fetch(url, {
@@ -203,7 +204,7 @@ export function ConversationalCheckIn({ accessToken, projectId, onComplete, onBa
     setIsAnalyzing(true);
 
     try {
-      const url = `https://${projectId}.supabase.co/functions/v1/make-server-636f4a29/checkin/analyze/${conversationId}`;
+      const url = API_URLS.analyzeConversation(conversationId);
       console.log('Analyzing conversation at:', url);
       
       const response = await fetch(url, {

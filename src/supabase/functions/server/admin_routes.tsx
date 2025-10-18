@@ -6,7 +6,7 @@
 // justo ANTES de la línea "Deno.serve(app.fetch);"
 
 // Get assistant status
-app.get('/make-server-636f4a29/admin/assistant-status', async (c) => {
+app.get('/admin/assistant-status', async (c) => {
   try {
     const user = await verifyUser(c.req.header('Authorization'));
     if (!user) {
@@ -31,7 +31,7 @@ app.get('/make-server-636f4a29/admin/assistant-status', async (c) => {
 });
 
 // List uploaded files
-app.get('/make-server-636f4a29/admin/files', async (c) => {
+app.get('/admin/files', async (c) => {
   try {
     const user = await verifyUser(c.req.header('Authorization'));
     if (!user) {
@@ -73,7 +73,7 @@ app.get('/make-server-636f4a29/admin/files', async (c) => {
 });
 
 // Upload PDF to OpenAI
-app.post('/make-server-636f4a29/admin/upload-pdf', async (c) => {
+app.post('/admin/upload-pdf', async (c) => {
   try {
     const user = await verifyUser(c.req.header('Authorization'));
     if (!user) {
@@ -271,7 +271,7 @@ Sé compasivo, directo y sabio. Usa un tono cálido pero profesional. Consulta l
 });
 
 // Delete file from OpenAI
-app.delete('/make-server-636f4a29/admin/files/:fileId', async (c) => {
+app.delete('/admin/files/:fileId', async (c) => {
   try {
     const user = await verifyUser(c.req.header('Authorization'));
     if (!user) {

@@ -21,6 +21,7 @@ import {
   Settings
 } from 'lucide-react';
 import { toast } from 'sonner@2.0.3';
+import { API_URLS } from '../utils/api';
 
 type Disciple = {
   id: string;
@@ -78,14 +79,11 @@ export function LeaderDashboard({ leaderName, accessToken, projectId, theme = 'l
     setError(null);
     
     try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-636f4a29/disciples`,
-        {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`
-          }
+      const response = await fetch(API_URLS.disciples(), {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
         }
-      );
+      });
 
       if (!response.ok) {
         throw new Error('Error al cargar discípulos');
@@ -103,14 +101,11 @@ export function LeaderDashboard({ leaderName, accessToken, projectId, theme = 'l
 
   const fetchPendingRequests = async () => {
     try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-636f4a29/pending-requests`,
-        {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`
-          }
+      const response = await fetch(API_URLS.pendingRequests(), {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
         }
-      );
+      });
 
       if (!response.ok) {
         throw new Error('Error al cargar solicitudes pendientes');
@@ -130,14 +125,11 @@ export function LeaderDashboard({ leaderName, accessToken, projectId, theme = 'l
     setIsLoadingAvailable(true);
     
     try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-636f4a29/available-disciples`,
-        {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`
-          }
+      const response = await fetch(API_URLS.availableDisciples(), {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
         }
-      );
+      });
 
       if (!response.ok) {
         throw new Error('Error al cargar usuarios disponibles');
@@ -155,12 +147,10 @@ export function LeaderDashboard({ leaderName, accessToken, projectId, theme = 'l
 
   const fetchLeaderStats = async () => {
     try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-636f4a29/leader-stats`,
-        {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`
-          }
+      const response = await fetch(API_URLS.leaderStats(), {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        }
         }
       );
 
@@ -180,10 +170,8 @@ export function LeaderDashboard({ leaderName, accessToken, projectId, theme = 'l
 
   const handleAssignDisciple = async (discipleId: string) => {
     try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-636f4a29/assign-disciple`,
-        {
-          method: 'POST',
+      const response = await fetch(API_URLS.assignDisciple(), {
+        method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${accessToken}`
@@ -215,10 +203,8 @@ export function LeaderDashboard({ leaderName, accessToken, projectId, theme = 'l
     }
 
     try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-636f4a29/unassign-disciple`,
-        {
-          method: 'POST',
+      const response = await fetch(API_URLS.unassignDisciple(), {
+        method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${accessToken}`

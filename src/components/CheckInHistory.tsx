@@ -4,6 +4,7 @@ import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { ScrollArea } from './ui/scroll-area';
+import { API_URLS } from '../utils/api';
 import { 
   Calendar, 
   TrendingUp, 
@@ -90,19 +91,19 @@ export function CheckInHistory({ accessToken, projectId, onBack }: Props) {
   const fetchCheckIns = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-636f4a29/checkins`,
-        {
-          headers: { 'Authorization': `Bearer ${accessToken}` }
-        }
-      );
+      const response = await fetch(API_URLS.checkins(), {
+        headers: { 'Authorization': `Bearer ${accessToken}` }
+      });
 
       if (response.ok) {
         const data = await response.json();
+        console.log('✅ Check-ins recibidos:', data);
         setCheckIns(data.checkIns || []);
+      } else {
+        console.error('❌ Error HTTP:', response.status, await response.text());
       }
     } catch (err) {
-      console.error('Error fetching check-ins:', err);
+      console.error('❌ Error fetching check-ins:', err);
     } finally {
       setIsLoading(false);
     }
@@ -110,19 +111,19 @@ export function CheckInHistory({ accessToken, projectId, onBack }: Props) {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-636f4a29/checkins-stats`,
-        {
-          headers: { 'Authorization': `Bearer ${accessToken}` }
-        }
-      );
+      const response = await fetch(API_URLS.checkinsStats(), {
+        headers: { 'Authorization': `Bearer ${accessToken}` }
+      });
 
       if (response.ok) {
         const data = await response.json();
+        console.log('✅ Stats recibidas:', data);
         setStats(data);
+      } else {
+        console.error('❌ Error stats HTTP:', response.status);
       }
     } catch (err) {
-      console.error('Error fetching stats:', err);
+      console.error('❌ Error fetching stats:', err);
     }
   };
 

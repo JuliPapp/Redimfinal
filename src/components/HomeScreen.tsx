@@ -30,6 +30,7 @@ import {
 } from './ui/dialog';
 import { toast } from 'sonner@2.0.3';
 import { projectId } from '../utils/supabase/info';
+import { API_URLS } from '../utils/api';
 import { MeetingScheduler } from './MeetingScheduler';
 
 type Props = {
@@ -99,14 +100,11 @@ export function HomeScreen({ mode, userName, accessToken, theme = 'light', onSta
       
       if (!session?.access_token) return;
 
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-636f4a29/checkins-stats`,
-        {
-          headers: {
-            'Authorization': `Bearer ${session.access_token}`
-          }
+      const response = await fetch(API_URLS.checkinsStats(), {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
         }
-      );
+      });
 
       if (response.ok) {
         const data = await response.json();
@@ -114,14 +112,11 @@ export function HomeScreen({ mode, userName, accessToken, theme = 'light', onSta
         setTotalDays(data.total || 0);
         
         // Check if user has checked in today
-        const checkInsResponse = await fetch(
-          `https://${projectId}.supabase.co/functions/v1/make-server-636f4a29/checkins`,
-          {
-            headers: {
-              'Authorization': `Bearer ${session.access_token}`
-            }
+        const checkInsResponse = await fetch(API_URLS.checkins(), {
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`
           }
-        );
+        });
         
         if (checkInsResponse.ok) {
           const checkInsData = await checkInsResponse.json();
@@ -148,7 +143,7 @@ export function HomeScreen({ mode, userName, accessToken, theme = 'light', onSta
     setIsLoadingLeader(true);
     try {
       const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-636f4a29/my-leader`,
+        API_URLS.myLeader(),
         {
           headers: {
             'Authorization': `Bearer ${accessToken}`
@@ -219,14 +214,11 @@ export function HomeScreen({ mode, userName, accessToken, theme = 'light', onSta
       
       if (!session?.access_token) return;
 
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-636f4a29/request-info`,
-        {
-          headers: {
-            'Authorization': `Bearer ${session.access_token}`
-          }
+      const response = await fetch(API_URLS.requestInfo(), {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
         }
-      );
+      });
 
       if (response.ok) {
         const data = await response.json();
@@ -249,15 +241,12 @@ export function HomeScreen({ mode, userName, accessToken, theme = 'light', onSta
       
       if (!session?.access_token) return;
 
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-636f4a29/accept-request`,
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${session.access_token}`
-          }
+      const response = await fetch(API_URLS.acceptRequest(), {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
         }
-      );
+      });
 
       if (response.ok) {
         setLeaderRequest(null);
@@ -290,15 +279,12 @@ export function HomeScreen({ mode, userName, accessToken, theme = 'light', onSta
       
       if (!session?.access_token) return;
 
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-636f4a29/reject-request`,
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${session.access_token}`
-          }
+      const response = await fetch(API_URLS.rejectRequest(), {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
         }
-      );
+      });
 
       if (response.ok) {
         toast.success('Solicitud rechazada');

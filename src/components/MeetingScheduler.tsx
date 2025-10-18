@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Textarea } from './ui/textarea';
 import { Calendar, Clock, CheckCircle2, XCircle, Loader2, RefreshCw, AlertCircle, Video } from 'lucide-react';
 import { toast } from 'sonner@2.0.3';
+import { API_URLS } from '../utils/api';
 
 type TimeSlot = {
   id: string;
@@ -71,12 +72,9 @@ export function MeetingScheduler({ userRole, leaderId, accessToken, projectId }:
   const fetchMyTimeSlots = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-636f4a29/time-slots`,
-        {
-          headers: { 'Authorization': `Bearer ${accessToken}` }
-        }
-      );
+      const response = await fetch(API_URLS.timeSlots(), {
+        headers: { 'Authorization': `Bearer ${accessToken}` }
+      });
 
       if (response.ok) {
         const data = await response.json();
@@ -92,11 +90,9 @@ export function MeetingScheduler({ userRole, leaderId, accessToken, projectId }:
   const fetchLeaderTimeSlots = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-636f4a29/leader-time-slots/${leaderId}`,
-        {
-          headers: { 'Authorization': `Bearer ${accessToken}` }
-        }
+      const response = await fetch(API_URLS.leaderTimeSlots(leaderId!), {
+        headers: { 'Authorization': `Bearer ${accessToken}` }
+      }
       );
 
       if (response.ok) {
@@ -112,12 +108,9 @@ export function MeetingScheduler({ userRole, leaderId, accessToken, projectId }:
 
   const fetchMyMeetings = async () => {
     try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-636f4a29/meetings`,
-        {
-          headers: { 'Authorization': `Bearer ${accessToken}` }
-        }
-      );
+      const response = await fetch(API_URLS.meetings(), {
+        headers: { 'Authorization': `Bearer ${accessToken}` }
+      });
 
       if (response.ok) {
         const data = await response.json();
@@ -136,21 +129,18 @@ export function MeetingScheduler({ userRole, leaderId, accessToken, projectId }:
 
     setIsAddingSlot(true);
     try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-636f4a29/time-slots`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${accessToken}`
-          },
-          body: JSON.stringify({
-            day: selectedDay,
-            start_time: startTime,
-            end_time: endTime
-          })
-        }
-      );
+      const response = await fetch(API_URLS.timeSlots(), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`
+        },
+        body: JSON.stringify({
+          day: selectedDay,
+          start_time: startTime,
+          end_time: endTime
+        })
+      });
 
       if (response.ok) {
         toast.success('Horario agregado exitosamente');
@@ -171,13 +161,10 @@ export function MeetingScheduler({ userRole, leaderId, accessToken, projectId }:
 
   const handleDeleteTimeSlot = async (slotId: string) => {
     try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-636f4a29/time-slots/${slotId}`,
-        {
-          method: 'DELETE',
-          headers: { 'Authorization': `Bearer ${accessToken}` }
-        }
-      );
+      const response = await fetch(API_URLS.deleteTimeSlot(slotId), {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${accessToken}` }
+      });
 
       if (response.ok) {
         toast.success('Horario eliminado');
@@ -192,20 +179,17 @@ export function MeetingScheduler({ userRole, leaderId, accessToken, projectId }:
 
   const handleRequestMeeting = async (slotId: string) => {
     try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-636f4a29/request-meeting`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${accessToken}`
-          },
-          body: JSON.stringify({
-            time_slot_id: slotId,
-            leader_id: leaderId
-          })
-        }
-      );
+      const response = await fetch(API_URLS.requestMeeting(), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`
+        },
+        body: JSON.stringify({
+          time_slot_id: slotId,
+          leader_id: leaderId
+        })
+      });
 
       if (response.ok) {
         toast.success('Solicitud de reunión enviada');
@@ -222,13 +206,10 @@ export function MeetingScheduler({ userRole, leaderId, accessToken, projectId }:
 
   const handleConfirmMeeting = async (meetingId: string) => {
     try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-636f4a29/meetings/${meetingId}/confirm`,
-        {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${accessToken}` }
-        }
-      );
+      const response = await fetch(API_URLS.confirmMeeting(meetingId), {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${accessToken}` }
+      });
 
       if (response.ok) {
         toast.success('Reunión confirmada');
@@ -243,13 +224,10 @@ export function MeetingScheduler({ userRole, leaderId, accessToken, projectId }:
 
   const handleCancelMeeting = async (meetingId: string) => {
     try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-636f4a29/meetings/${meetingId}/cancel`,
-        {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${accessToken}` }
-        }
-      );
+      const response = await fetch(API_URLS.cancelMeeting(meetingId), {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${accessToken}` }
+      });
 
       if (response.ok) {
         toast.success('Reunión cancelada');
@@ -272,7 +250,7 @@ export function MeetingScheduler({ userRole, leaderId, accessToken, projectId }:
 
     try {
       const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-636f4a29/meetings/${meetingId}/cancel-confirmed`,
+        `https://${projectId}.supabase.co/functions/v1/server/meetings/${meetingId}/cancel-confirmed`,
         {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${accessToken}` }
@@ -309,17 +287,14 @@ export function MeetingScheduler({ userRole, leaderId, accessToken, projectId }:
     }
 
     try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-636f4a29/meetings/${selectedMeeting.id}/request-reschedule`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${accessToken}`
-          },
-          body: JSON.stringify({ reason: rescheduleReason })
-        }
-      );
+      const response = await fetch(API_URLS.requestReschedule(selectedMeeting.id), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`
+        },
+        body: JSON.stringify({ reason: rescheduleReason })
+      });
 
       if (response.ok) {
         toast.success('Solicitud de cambio enviada');
@@ -338,13 +313,10 @@ export function MeetingScheduler({ userRole, leaderId, accessToken, projectId }:
 
   const handleApproveReschedule = async (meetingId: string) => {
     try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-636f4a29/meetings/${meetingId}/approve-reschedule`,
-        {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${accessToken}` }
-        }
-      );
+      const response = await fetch(API_URLS.approveReschedule(meetingId), {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${accessToken}` }
+      });
 
       if (response.ok) {
         toast.success('Cambio de horario aprobado. El horario ahora está disponible.');
@@ -361,13 +333,10 @@ export function MeetingScheduler({ userRole, leaderId, accessToken, projectId }:
 
   const handleRejectReschedule = async (meetingId: string) => {
     try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-636f4a29/meetings/${meetingId}/reject-reschedule`,
-        {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${accessToken}` }
-        }
-      );
+      const response = await fetch(API_URLS.rejectReschedule(meetingId), {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${accessToken}` }
+      });
 
       if (response.ok) {
         toast.success('Solicitud de cambio rechazada');

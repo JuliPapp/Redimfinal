@@ -20,6 +20,7 @@ import {
   Edit2
 } from 'lucide-react';
 import { toast } from 'sonner@2.0.3';
+import { API_URLS } from '../utils/api';
 
 type Resource = {
   id: string;
@@ -85,12 +86,9 @@ export function SpiritualLibrary({ userRole, accessToken, projectId, onBack }: P
 
   const fetchCurrentUser = async () => {
     try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/server/auth/profile`,
-        {
-          headers: { 'Authorization': `Bearer ${accessToken}` }
-        }
-      );
+      const response = await fetch(API_URLS.profile(), {
+        headers: { 'Authorization': `Bearer ${accessToken}` }
+      });
       if (response.ok) {
         const data = await response.json();
         setCurrentUserId(data.profile.id);
@@ -103,12 +101,9 @@ export function SpiritualLibrary({ userRole, accessToken, projectId, onBack }: P
   const fetchResources = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-636f4a29/library`,
-        {
-          headers: { 'Authorization': `Bearer ${accessToken}` }
-        }
-      );
+      const response = await fetch(API_URLS.library(), {
+        headers: { 'Authorization': `Bearer ${accessToken}` }
+      });
 
       if (response.ok) {
         const data = await response.json();
@@ -140,10 +135,8 @@ export function SpiritualLibrary({ userRole, accessToken, projectId, onBack }: P
 
     setIsSubmitting(true);
     try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-636f4a29/library`,
-        {
-          method: 'POST',
+      const response = await fetch(API_URLS.library(), {
+        method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${accessToken}`
@@ -206,10 +199,8 @@ export function SpiritualLibrary({ userRole, accessToken, projectId, onBack }: P
 
     setIsSubmitting(true);
     try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-636f4a29/library/${editingResource.id}`,
-        {
-          method: 'PUT',
+      const response = await fetch(API_URLS.updateLibraryResource(editingResource.id), {
+        method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${accessToken}`
@@ -248,13 +239,10 @@ export function SpiritualLibrary({ userRole, accessToken, projectId, onBack }: P
     }
 
     try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-636f4a29/library/${resourceId}`,
-        {
-          method: 'DELETE',
-          headers: { 'Authorization': `Bearer ${accessToken}` }
-        }
-      );
+      const response = await fetch(API_URLS.deleteLibraryResource(resourceId), {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${accessToken}` }
+      });
 
       if (response.ok) {
         toast.success('Recurso eliminado');

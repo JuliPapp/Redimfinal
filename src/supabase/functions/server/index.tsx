@@ -10,9 +10,11 @@ import { createClient } from 'jsr:@supabase/supabase-js@2';
 import * as crypto from 'node:crypto';
 import { Buffer } from 'node:buffer';
 
-const app = new Hono();
-// Middleware - CORS with explicit configuration
-app.use('*', cors({
+// Crear app principal
+const mainApp = new Hono();
+
+// Middleware global - CORS y logger
+mainApp.use('*', cors({
   origin: '*',
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowHeaders: ['Content-Type', 'Authorization'],
@@ -20,7 +22,10 @@ app.use('*', cors({
   maxAge: 600,
   credentials: false,
 }));
-app.use('*', logger(console.log));
+mainApp.use('*', logger(console.log));
+
+// Crear sub-app para las rutas con prefijo
+const app = new Hono();
 
 const supabase = createClient(
   Deno.env.get('SUPABASE_URL')!,
@@ -2803,4 +2808,18 @@ app.all('*', (c) => {
   }, 404);
 });
 
-Deno.serve(app.fetch);
+// Montar la sub-app en el prefijo de Supabase
+mainApp.route('/make-server-636f4a29', app);
+
+// Health check en la raíz (sin prefijo)
+mainApp.get('/', (c) => {
+  console.log('=== ROOT ACCESSED ===');
+  return c.json({ 
+    status: 'ok',
+    message: 'Camino de Restauración API',
+    timestamp: new Date().toISOString(),
+    routes_prefix: '/make-server-636f4a29'
+  });
+});
+
+Deno.serve(mainApp.fetch);

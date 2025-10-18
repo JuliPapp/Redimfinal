@@ -15,6 +15,7 @@ import {
   Settings
 } from 'lucide-react';
 import { toast } from 'sonner@2.0.3';
+import { API_URLS } from '../utils/api';
 
 type UploadedFile = {
   id: string;
@@ -45,14 +46,11 @@ export function AdminPanel({ accessToken, projectId, onBack }: AdminPanelProps) 
 
   const checkAssistant = async () => {
     try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-636f4a29/admin/assistant-status`,
-        {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`
-          }
+      const response = await fetch(API_URLS.assistantStatus(), {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
         }
-      );
+      });
 
       if (response.ok) {
         const data = await response.json();
@@ -71,7 +69,7 @@ export function AdminPanel({ accessToken, projectId, onBack }: AdminPanelProps) 
     setIsLoading(true);
     try {
       const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-636f4a29/admin/files`,
+        `https://${projectId}.supabase.co/functions/v1/server/admin/files`,
         {
           headers: {
             'Authorization': `Bearer ${accessToken}`
@@ -118,7 +116,7 @@ export function AdminPanel({ accessToken, projectId, onBack }: AdminPanelProps) 
 
     try {
       const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-636f4a29/admin/upload-pdf`,
+        `https://${projectId}.supabase.co/functions/v1/server/admin/upload-pdf`,
         {
           method: 'POST',
           headers: {
@@ -163,7 +161,7 @@ export function AdminPanel({ accessToken, projectId, onBack }: AdminPanelProps) 
 
     try {
       const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-636f4a29/admin/files/${fileId}`,
+        `https://${projectId}.supabase.co/functions/v1/server/admin/files/${fileId}`,
         {
           method: 'DELETE',
           headers: {

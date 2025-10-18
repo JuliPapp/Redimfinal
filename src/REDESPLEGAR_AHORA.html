@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 REDESPLEGAR Función en Supabase</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .problem {
+            background: #fee;
+            border-left: 5px solid #f44;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+        }
+        
+        .problem h2 {
+            color: #c33;
+            margin-bottom: 10px;
+            font-size: 1.5em;
+        }
+        
+        .problem code {
+            background: #fdd;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .steps {
+            counter-reset: step-counter;
+        }
+        
+        .step {
+            position: relative;
+            padding-left: 60px;
+            margin-bottom: 30px;
+            padding-bottom: 30px;
+            border-left: 3px solid #e0e0e0;
+        }
+        
+        .step:last-child {
+            border-left-color: transparent;
+        }
+        
+        .step::before {
+            counter-increment: step-counter;
+            content: counter(step-counter);
+            position: absolute;
+            left: -20px;
+            top: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .step h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .step p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        
+        .url-box {
+            background: #f8f9fa;
+            border: 2px solid #667eea;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            color: #667eea;
+            font-weight: bold;
+            margin: 15px 0;
+            word-break: break-all;
+        }
+        
+        .success {
+            background: #d4edda;
+            border-left: 5px solid #28a745;
+            padding: 20px;
+            margin-top: 30px;
+            border-radius: 8px;
+        }
+        
+        .success h2 {
+            color: #155724;
+            margin-bottom: 10px;
+        }
+        
+        .success ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .success li {
+            padding: 8px 0;
+            color: #155724;
+        }
+        
+        .success li::before {
+            content: '✅ ';
+            margin-right: 8px;
+        }
+        
+        .warning {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        
+        .warning strong {
+            color: #856404;
+        }
+        
+        .code-section {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        
+        .code-section pre {
+            margin: 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        .highlight {
+            background: yellow;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 REDESPLEGAR FUNCIÓN</h1>
+            <p>Sigue estos pasos para actualizar el código en Supabase</p>
+        </div>
+        
+        <div class="content">
+            <div class="problem">
+                <h2>⚠️ Problema Detectado</h2>
+                <p>El código desplegado en Supabase está <strong>DESACTUALIZADO</strong>.</p>
+                <p>El error muestra que Hono recibe: <code>/make-server-636f4a29/auth/profile</code></p>
+                <p>Pero debería recibir solo: <code>/auth/profile</code></p>
+                <p><strong>Solución:</strong> Redesplegar la función con el código actualizado.</p>
+            </div>
+            
+            <div class="steps">
+                <div class="step">
+                    <h3>Abre Supabase Dashboard</h3>
+                    <p>Navega a tu proyecto en Supabase:</p>
+                    <div class="url-box">
+                        https://supabase.com/dashboard/project/jxvikpmfcpzyjjksmhnd
+                    </div>
+                    <p>Si no estás logueado, inicia sesión primero.</p>
+                </div>
+                
+                <div class="step">
+                    <h3>Ve a Edge Functions</h3>
+                    <p>En el menú lateral izquierdo, busca y haz click en <strong>"Edge Functions"</strong></p>
+                    <p>Deberías ver una lista de funciones. Busca la función llamada:</p>
+                    <div class="url-box">
+                        make-server-636f4a29
+                    </div>
+                    <p>Haz click en ella para abrirla.</p>
+                </div>
+                
+                <div class="step">
+                    <h3>Abre el Editor</h3>
+                    <p>Dentro de la función, busca un botón que diga <strong>"Edit Function"</strong>, <strong>"Code"</strong> o similar.</p>
+                    <p>Esto abrirá un editor de código donde puedes ver y modificar el código actual.</p>
+                </div>
+                
+                <div class="step">
+                    <h3>Copia el Código Actualizado</h3>
+                    <p>En Figma Make:</p>
+                    <ol style="margin-left: 20px; margin-top: 10px;">
+                        <li>Abre el archivo <code>/supabase/functions/server/index.tsx</code></li>
+                        <li>Selecciona <span class="highlight">TODO</span> el contenido (Ctrl+A / Cmd+A)</li>
+                        <li>Copia (Ctrl+C / Cmd+C)</li>
+                    </ol>
+                    
+                    <div class="warning">
+                        <strong>⚠️ IMPORTANTE:</strong> Copia DESDE la primera línea hasta la última línea, incluyendo <code>Deno.serve(app.fetch);</code>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <h3>Reemplaza el Código en Supabase</h3>
+                    <p>En el editor de Supabase:</p>
+                    <ol style="margin-left: 20px; margin-top: 10px;">
+                        <li>Selecciona TODO el código viejo (Ctrl+A / Cmd+A)</li>
+                        <li>Elimínalo (Delete / Backspace)</li>
+                        <li>Pega el código nuevo (Ctrl+V / Cmd+V)</li>
+                    </ol>
+                    
+                    <p style="margin-top: 15px;">Verifica que las rutas se vean así:</p>
+                    <div class="code-section">
+                        <pre>app.get('/auth/profile', async (c) => {
+app.post('/auth/signup', async (c) => {
+app.get('/checkins', async (c) => {
+app.get('/admin/assistant-status', async (c) => {
+// etc...</pre>
+                    </div>
+                    
+                    <div class="warning">
+                        <strong>✅ CORRECTO:</strong> <code>app.get('/auth/profile', ...)</code><br>
+                        <strong>❌ INCORRECTO:</strong> <code>app.get('/make-server-636f4a29/auth/profile', ...)</code>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <h3>Despliega la Función</h3>
+                    <p>Busca un botón que diga <strong>"Deploy"</strong>, <strong>"Save & Deploy"</strong> o <strong>"Update"</strong>.</p>
+                    <p>Haz click en él y espera a que termine el despliegue (30-60 segundos).</p>
+                    <p>Deberías ver un mensaje como:</p>
+                    <div class="url-box" style="border-color: #28a745; color: #28a745;">
+                        ✅ Deployed successfully
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <h3>Prueba la Aplicación</h3>
+                    <p>Vuelve a la aplicación "Camino de Restauración" e intenta iniciar sesión nuevamente.</p>
+                    <p>El error <code>404 Not Found</code> debería desaparecer.</p>
+                </div>
+            </div>
+            
+            <div class="success">
+                <h2>✅ Verificación Exitosa</h2>
+                <p>Después del despliegue, deberías poder:</p>
+                <ul>
+                    <li>Iniciar sesión correctamente</li>
+                    <li>Ver tu perfil de usuario</li>
+                    <li>Hacer check-ins</li>
+                    <li>Acceder al panel de administración</li>
+                    <li>Subir PDFs (como admin)</li>
+                </ul>
+            </div>
+            
+            <div class="warning" style="margin-top: 30px;">
+                <strong>🆘 ¿Sigues teniendo problemas?</strong><br><br>
+                
+                <strong>1. Revisa los logs en Supabase:</strong><br>
+                Dashboard → Edge Functions → make-server-636f4a29 → Logs<br><br>
+                
+                <strong>2. Verifica las variables de entorno:</strong><br>
+                Dashboard → Settings → Edge Functions → Secrets<br>
+                Asegúrate de que existan: OPENAI_API_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY<br><br>
+                
+                <strong>3. Verifica la base de datos:</strong><br>
+                Dashboard → SQL Editor → Ejecuta: <code>SELECT * FROM profiles LIMIT 1;</code><br>
+                Si da error, ejecuta el script <code>SQL_CREAR_TABLAS.sql</code>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

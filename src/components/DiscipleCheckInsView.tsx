@@ -98,7 +98,7 @@ export function DiscipleCheckInsView({ disciple, accessToken, projectId, onBack 
     setIsWalkingAlone(false);
     try {
       const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-636f4a29/checkins/${disciple.id}`,
+        `https://${projectId}.supabase.co/functions/v1/server/checkins/${disciple.id}`,
         {
           headers: { 'Authorization': `Bearer ${accessToken}` }
         }

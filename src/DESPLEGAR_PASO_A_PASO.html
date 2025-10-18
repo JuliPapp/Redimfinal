@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 DESPLEGAR EN SUPABASE - PASO A PASO</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #667eea;
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 1.2em;
+            margin-bottom: 40px;
+        }
+        .step {
+            background: #f8f9fa;
+            border-left: 5px solid #667eea;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 8px;
+        }
+        .step h2 {
+            margin-top: 0;
+            color: #667eea;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .step-number {
+            background: #667eea;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        code {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 8px;
+            display: block;
+            overflow-x: auto;
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            font-size: 14px;
+            margin: 15px 0;
+        }
+        .inline-code {
+            background: #e9ecef;
+            color: #e83e8c;
+            padding: 3px 8px;
+            border-radius: 4px;
+            display: inline;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+        }
+        .warning {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .success {
+            background: #d4edda;
+            border-left: 5px solid #28a745;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .danger {
+            background: #f8d7da;
+            border-left: 5px solid #dc3545;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .btn {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s;
+            margin: 10px 5px;
+        }
+        .btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        ul {
+            line-height: 1.8;
+        }
+        .highlight {
+            background: yellow;
+            padding: 2px 5px;
+            font-weight: bold;
+        }
+        .check {
+            color: #28a745;
+            font-size: 1.2em;
+        }
+        .cross {
+            color: #dc3545;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 REDESPLEGAR EN SUPABASE</h1>
+        <p class="subtitle">Solución definitiva al error 404</p>
+
+        <div class="danger">
+            <strong>⚠️ IMPORTANTE:</strong> El código en Supabase está desactualizado. Sigue estos pasos EXACTAMENTE.
+        </div>
+
+        <div class="step">
+            <h2><span class="step-number">1</span> Abre Supabase Dashboard</h2>
+            <p>Haz click en este botón para abrir la función directamente:</p>
+            <a href="https://supabase.com/dashboard/project/jxvikpmfcpzyjjksmhnd/functions/make-server-636f4a29/details" class="btn" target="_blank">
+                🔗 Abrir Función en Supabase
+            </a>
+        </div>
+
+        <div class="step">
+            <h2><span class="step-number">2</span> Encuentra el botón "Edit Function"</h2>
+            <p>En la página que se abrió, busca y haz click en:</p>
+            <ul>
+                <li><span class="inline-code">Edit Function</span> (esquina superior derecha)</li>
+                <li>O la pestaña <span class="inline-code">Code</span></li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <h2><span class="step-number">3</span> Verifica el código VIEJO</h2>
+            <p>En el editor de Supabase, busca esta línea (aproximadamente línea 13):</p>
+            <code>const app = new Hono();</code>
+            <div class="warning">
+                <strong>⚠️ SI VES ESTO:</strong> Tu código está desactualizado. Continúa al siguiente paso.
+            </div>
+        </div>
+
+        <div class="step">
+            <h2><span class="step-number">4</span> Borra TODO el código viejo</h2>
+            <p>En el editor de Supabase:</p>
+            <ul>
+                <li>Presiona <span class="inline-code">Ctrl+A</span> (Windows) o <span class="inline-code">Cmd+A</span> (Mac)</li>
+                <li>Esto selecciona TODO el código</li>
+                <li>Presiona <span class="inline-code">Delete</span> o <span class="inline-code">Backspace</span></li>
+            </ul>
+            <div class="warning">
+                <strong>✋ ESPERA:</strong> NO hagas click en "Save" todavía. Primero necesitas copiar el código nuevo.
+            </div>
+        </div>
+
+        <div class="step">
+            <h2><span class="step-number">5</span> Copia el código NUEVO de Figma Make</h2>
+            <p>En Figma Make (esta ventana):</p>
+            <ul>
+                <li>Abre el archivo: <span class="inline-code">/supabase/functions/server/index.tsx</span></li>
+                <li>Presiona <span class="inline-code">Ctrl+A</span> o <span class="inline-code">Cmd+A</span></li>
+                <li>Presiona <span class="inline-code">Ctrl+C</span> o <span class="inline-code">Cmd+C</span></li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <h2><span class="step-number">6</span> Pega el código NUEVO en Supabase</h2>
+            <p>Regresa a la ventana de Supabase:</p>
+            <ul>
+                <li>Haz click en el editor (debe estar vacío después del paso 4)</li>
+                <li>Presiona <span class="inline-code">Ctrl+V</span> o <span class="inline-code">Cmd+V</span></li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <h2><span class="step-number">7</span> VERIFICA que el código se copió bien</h2>
+            <p>Busca la línea 13-15 aproximadamente. DEBE decir:</p>
+            <code>const app = new Hono({ basePath: '/make-server-636f4a29' });</code>
+            
+            <div class="success">
+                <strong><span class="check">✅</span> SI VES ESTO:</strong> El código se copió correctamente. Continúa.
+            </div>
+            
+            <div class="danger">
+                <strong><span class="cross">❌</span> SI NO VES ESTO:</strong> Repite los pasos 4-6.
+            </div>
+        </div>
+
+        <div class="step">
+            <h2><span class="step-number">8</span> Verifica el FINAL del archivo</h2>
+            <p>Ve al final del archivo (Ctrl+End o Cmd+End). La ÚLTIMA línea DEBE ser:</p>
+            <code>Deno.serve(app.fetch);</code>
+            
+            <div class="success">
+                <strong><span class="check">✅</span> SI VES ESTO:</strong> El archivo está completo.
+            </div>
+            
+            <div class="danger">
+                <strong><span class="cross">❌</span> SI NO VES ESTO:</strong> El archivo se copió incompleto. Repite los pasos 4-6.
+            </div>
+        </div>
+
+        <div class="step">
+            <h2><span class="step-number">9</span> GUARDA y DESPLIEGA</h2>
+            <p>En Supabase, haz click en:</p>
+            <ul>
+                <li><span class="inline-code">Save</span> o <span class="inline-code">Deploy</span></li>
+                <li>Espera a ver: <span class="highlight">✅ Deployed successfully</span></li>
+                <li>Esto puede tomar 30-90 segundos</li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <h2><span class="step-number">10</span> VERIFICA en los LOGS</h2>
+            <p>Después del deploy:</p>
+            <ul>
+                <li>En Supabase, ve a la pestaña <span class="inline-code">Logs</span></li>
+                <li>Regresa a tu app y haz login</li>
+                <li>Deberías ver en los logs: <code>🔍 DIAGNÓSTICO - Método: GET, Path: /auth/profile</code></li>
+            </ul>
+            
+            <div class="success">
+                <strong><span class="check">✅</span> SI VES LOS LOGS:</strong> ¡Funcionó! Tu app ahora funcionará.
+            </div>
+        </div>
+
+        <div class="success" style="margin-top: 40px; text-align: center; font-size: 1.2em;">
+            <strong>🎉 ¡Listo! Tu función está actualizada.</strong>
+            <p style="margin-top: 10px;">Prueba hacer login en la app.</p>
+        </div>
+
+        <div class="warning" style="margin-top: 30px;">
+            <strong>❓ Si SIGUE fallando después de estos pasos:</strong>
+            <ul>
+                <li>Verifica que el nombre de la función sea exactamente: <span class="inline-code">make-server-636f4a29</span></li>
+                <li>Verifica en los logs de Supabase qué error aparece</li>
+                <li>Comparte el error exacto que ves</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
