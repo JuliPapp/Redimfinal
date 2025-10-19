@@ -11,6 +11,7 @@ import { CrisisScreen } from './components/CrisisScreen';
 import { DailyPlanScreen } from './components/DailyPlanScreen';
 import { CheckInHistory } from './components/CheckInHistory';
 import { SpiritualLibrary } from './components/SpiritualLibrary';
+import { DiscipleProfile } from './components/DiscipleProfile';
 import { AdminPanel } from './components/AdminPanel';
 import { Toaster } from './components/ui/sonner';
 import { createClient } from './utils/supabase/client';
@@ -49,6 +50,7 @@ type AppState =
   | { screen: 'checkin-conversational' }
   | { screen: 'history' }
   | { screen: 'library' }
+  | { screen: 'profile' }
   | { screen: 'admin-panel' }
   | { screen: 'root-questions'; checkInData: CheckInData }
   | { screen: 'crisis'; checkInData: CheckInData }
@@ -374,6 +376,10 @@ export default function App() {
     setState({ screen: 'checkin-choice' });
   };
 
+  const handleViewProfile = () => {
+    setState({ screen: 'profile' });
+  };
+
   const handleSelectTraditionalCheckIn = () => {
     setState({ screen: 'checkin' });
   };
@@ -500,6 +506,7 @@ export default function App() {
                 onStartCheckIn={handleStartCheckIn}
                 onViewHistory={handleViewHistory}
                 onViewResources={handleViewLibrary}
+                onViewProfile={handleViewProfile}
                 onLogout={handleLogout}
                 onModeChange={handleModeChange}
                 onThemeToggle={toggleTheme}
@@ -548,6 +555,14 @@ export default function App() {
                 userRole={profile.role as 'leader' | 'disciple' | 'admin'}
                 accessToken={accessToken}
                 projectId={projectId}
+                onBack={handleBackToHome}
+              />
+            );
+          
+          case 'profile':
+            return (
+              <DiscipleProfile
+                accessToken={accessToken}
                 onBack={handleBackToHome}
               />
             );

@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚨 REDESPLEGAR URGENTE - Rutas Leader Notes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .alert {
+            background: #fee;
+            border-left: 5px solid #f44;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 5px;
+        }
+        
+        .alert h3 {
+            color: #c00;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+        
+        .alert p {
+            color: #600;
+            line-height: 1.6;
+        }
+        
+        .success {
+            background: #efe;
+            border-left: 5px solid #4a4;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 5px;
+        }
+        
+        .success h3 {
+            color: #060;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+        
+        .step {
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-left: 5px solid #667eea;
+        }
+        
+        .step-number {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-right: 15px;
+        }
+        
+        .step h3 {
+            display: inline;
+            font-size: 1.3em;
+            color: #333;
+        }
+        
+        .step-content {
+            margin-top: 15px;
+            padding-left: 55px;
+            line-height: 1.8;
+            color: #555;
+        }
+        
+        .code {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px 20px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        
+        .url {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-family: monospace;
+            font-weight: bold;
+        }
+        
+        .button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-top: 20px;
+            transition: transform 0.2s;
+        }
+        
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .screenshot-box {
+            background: #f0f0f0;
+            border: 2px dashed #999;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 20px 0;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .highlight {
+            background: #ffeb3b;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        
+        .section-title {
+            color: #667eea;
+            font-size: 1.8em;
+            margin: 30px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        ul {
+            padding-left: 55px;
+            line-height: 2;
+        }
+        
+        li {
+            margin-bottom: 10px;
+        }
+        
+        .info-box {
+            background: #e8f5e9;
+            border-left: 5px solid #4caf50;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .warning-box {
+            background: #fff3e0;
+            border-left: 5px solid #ff9800;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚨 REDESPLEGAR URGENTE</h1>
+            <p>Las rutas de Leader Notes necesitan ser redesplegadas AHORA</p>
+        </div>
+        
+        <div class="content">
+            <div class="alert">
+                <h3>⚠️ PROBLEMA ACTUAL</h3>
+                <p>Los cambios que acabamos de hacer están solo en tu código local. La Edge Function que está corriendo en Supabase <strong>todavía tiene la versión vieja</strong>, por eso sigues viendo el error "Route not found".</p>
+                <p style="margin-top: 10px;"><strong>Solución:</strong> Redesplegar la Edge Function a Supabase inmediatamente.</p>
+            </div>
+            
+            <div class="success">
+                <h3>✅ LO QUE HEMOS CORREGIDO</h3>
+                <p>Las rutas de leader-notes y disciple-info ahora están correctamente configuradas en tu código local con el prefijo completo:</p>
+                <div class="code">
+GET  /make-server-636f4a29/leader-notes/:discipleId<br>
+POST /make-server-636f4a29/leader-notes/:discipleId<br>
+GET  /make-server-636f4a29/disciple-info/:discipleId
+                </div>
+            </div>
+
+            <h2 class="section-title">📋 INSTRUCCIONES PASO A PASO</h2>
+
+            <div class="step">
+                <span class="step-number">1</span>
+                <h3>Abre el Dashboard de Supabase</h3>
+                <div class="step-content">
+                    <p>Ve a: <a href="https://supabase.com/dashboard" target="_blank" class="url">https://supabase.com/dashboard</a></p>
+                    <p>Inicia sesión si es necesario.</p>
+                </div>
+            </div>
+
+            <div class="step">
+                <span class="step-number">2</span>
+                <h3>Selecciona tu Proyecto</h3>
+                <div class="step-content">
+                    <p>Haz clic en tu proyecto <span class="highlight">"Camino de Restauración"</span></p>
+                </div>
+            </div>
+
+            <div class="step">
+                <span class="step-number">3</span>
+                <h3>Ve a Edge Functions</h3>
+                <div class="step-content">
+                    <p>En el menú lateral izquierdo, busca y haz clic en <span class="highlight">"Edge Functions"</span></p>
+                    <div class="screenshot-box">
+                        📱 Menú lateral → Edge Functions
+                    </div>
+                </div>
+            </div>
+
+            <div class="step">
+                <span class="step-number">4</span>
+                <h3>Busca la Función</h3>
+                <div class="step-content">
+                    <p>Busca la función llamada: <span class="url">make-server-636f4a29</span></p>
+                    <p>Haz clic sobre ella para abrirla.</p>
+                </div>
+            </div>
+
+            <div class="step">
+                <span class="step-number">5</span>
+                <h3>Redesplegar la Función</h3>
+                <div class="step-content">
+                    <p>Verás un botón que dice <span class="highlight">"Deploy"</span> o <span class="highlight">"Redeploy"</span></p>
+                    <p><strong>Haz clic en ese botón.</strong></p>
+                    <div class="warning-box">
+                        <strong>⏱️ Importante:</strong> El despliegue puede tardar entre 30 segundos y 2 minutos. Espera a que termine completamente.
+                    </div>
+                </div>
+            </div>
+
+            <div class="step">
+                <span class="step-number">6</span>
+                <h3>Verifica el Despliegue</h3>
+                <div class="step-content">
+                    <p>Una vez desplegado, verás un mensaje de éxito. Espera unos segundos más para que se propague.</p>
+                    <div class="info-box">
+                        <strong>✅ Señales de éxito:</strong>
+                        <ul>
+                            <li>Mensaje "Deployment successful" o similar</li>
+                            <li>Estado cambia a "Active" o "Deployed"</li>
+                            <li>Timestamp actualizado a hace pocos segundos</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step">
+                <span class="step-number">7</span>
+                <h3>Prueba tu Aplicación</h3>
+                <div class="step-content">
+                    <p>Vuelve a tu aplicación y:</p>
+                    <ul>
+                        <li>Refresca la página (F5 o Ctrl+R)</li>
+                        <li>Intenta hacer clic en "Ver Perfil" de un discípulo</li>
+                        <li>El error "Route not found" debería desaparecer</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h3>💡 ¿Por qué necesito redesplegar?</h3>
+                <p>Figma Make guarda tu código localmente, pero cuando usas Supabase Edge Functions, el código que se ejecuta está en los servidores de Supabase, no en tu computadora. Por eso cada vez que modificamos el archivo <code>index.tsx</code> en <code>/supabase/functions/server/</code>, necesitas redesplegar para que Supabase use la nueva versión.</p>
+            </div>
+
+            <div class="warning-box">
+                <h3>⚠️ Si el error persiste después de redesplegar</h3>
+                <p>Intenta estos pasos adicionales:</p>
+                <ul>
+                    <li>Espera 1-2 minutos más (propagación de caché)</li>
+                    <li>Cierra completamente tu navegador y vuelve a abrirlo</li>
+                    <li>Limpia la caché del navegador (Ctrl+Shift+Delete)</li>
+                    <li>Verifica que la función se desplegó correctamente en el dashboard</li>
+                </ul>
+            </div>
+
+            <div style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 2px solid #eee;">
+                <p style="color: #666; margin-bottom: 15px;">¿Listo para redesplegar?</p>
+                <a href="https://supabase.com/dashboard" target="_blank" class="button">
+                    🚀 Ir a Supabase Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

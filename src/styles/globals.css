@@ -2,80 +2,122 @@
 
 :root {
   --font-size: 16px;
-  --background: #ffffff;
-  --foreground: oklch(0.145 0 0);
-  --card: #ffffff;
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: #030213;
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.95 0.0058 264.53);
-  --secondary-foreground: #030213;
-  --muted: #ececf0;
-  --muted-foreground: #717182;
-  --accent: #e9ebef;
-  --accent-foreground: #030213;
-  --destructive: #d4183d;
+  /* Fondo suave crema/beige muy claro */
+  --background: #fdfcfb;
+  --foreground: #2d3748;
+  
+  /* Cards con tono lavanda muy suave */
+  --card: #fdfcfe;
+  --card-foreground: #2d3748;
+  
+  /* Popovers */
+  --popover: #ffffff;
+  --popover-foreground: #2d3748;
+  
+  /* Primary: Azul cielo pastel suave */
+  --primary: #7eb3d5;
+  --primary-foreground: #ffffff;
+  
+  /* Secondary: Lavanda pastel */
+  --secondary: #e6dff7;
+  --secondary-foreground: #4a3d63;
+  
+  /* Muted: Verde menta muy suave */
+  --muted: #e8f5f1;
+  --muted-foreground: #5a6c6d;
+  
+  /* Accent: Rosa pastel suave */
+  --accent: #fce8ed;
+  --accent-foreground: #6b4654;
+  
+  /* Destructive: Rosa coral suave */
+  --destructive: #e89ca0;
   --destructive-foreground: #ffffff;
-  --border: rgba(0, 0, 0, 0.1);
+  
+  /* Bordes sutiles */
+  --border: #e5dfe8;
   --input: transparent;
-  --input-background: #f3f3f5;
-  --switch-background: #cbced4;
+  --input-background: #f9f7fb;
+  --switch-background: #d3c9e0;
+  
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: #030213;
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --ring: #b8a8d8;
+  
+  /* Charts con colores pasteles armoniosos */
+  --chart-1: #a8cbe5; /* Azul cielo */
+  --chart-2: #b8dcd2; /* Verde agua */
+  --chart-3: #e6bdd4; /* Rosa lavanda */
+  --chart-4: #f4d4a7; /* Durazno */
+  --chart-5: #d4b8e8; /* Lavanda */
+  
+  --radius: 0.75rem;
+  
+  /* Sidebar con tono beige/crema */
+  --sidebar: #faf8f6;
+  --sidebar-foreground: #2d3748;
+  --sidebar-primary: #7eb3d5;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f3ede8;
+  --sidebar-accent-foreground: #4a3d63;
+  --sidebar-border: #ebe4de;
+  --sidebar-ring: #b8a8d8;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.439 0 0);
+  /* Modo oscuro con tonos suaves y cálidos */
+  --background: #2a2438;
+  --foreground: #f5f3f7;
+  
+  --card: #352d47;
+  --card-foreground: #f5f3f7;
+  
+  --popover: #2a2438;
+  --popover-foreground: #f5f3f7;
+  
+  /* Primary: Lavanda suave para dark mode */
+  --primary: #b4a0d9;
+  --primary-foreground: #2a2438;
+  
+  /* Secondary: Azul grisáceo suave */
+  --secondary: #4a5168;
+  --secondary-foreground: #e8e6f0;
+  
+  /* Muted: Gris púrpura suave */
+  --muted: #3d3654;
+  --muted-foreground: #b8b3c7;
+  
+  /* Accent: Rosa lavanda suave */
+  --accent: #5a4560;
+  --accent-foreground: #f5d4e3;
+  
+  /* Destructive suave */
+  --destructive: #d9919a;
+  --destructive-foreground: #ffffff;
+  
+  --border: #4a3d5a;
+  --input: #352d47;
+  --ring: #8a7aa8;
+  
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.269 0 0);
-  --sidebar-ring: oklch(0.439 0 0);
+  
+  /* Charts más suaves para dark mode */
+  --chart-1: #8fb4d4;
+  --chart-2: #9bcfbf;
+  --chart-3: #d4a3c4;
+  --chart-4: #e6c48f;
+  --chart-5: #b89dd8;
+  
+  /* Sidebar dark suave */
+  --sidebar: #241f32;
+  --sidebar-foreground: #f5f3f7;
+  --sidebar-primary: #b4a0d9;
+  --sidebar-primary-foreground: #2a2438;
+  --sidebar-accent: #3d3654;
+  --sidebar-accent-foreground: #e8e6f0;
+  --sidebar-border: #3d3654;
+  --sidebar-ring: #8a7aa8;
 }
 
 @theme inline {
@@ -186,4 +228,94 @@
 
 html {
   font-size: var(--font-size);
+}
+
+/* Calendar modifiers for confirmed meetings */
+.rdp-day_confirmed {
+  background-color: #dbeafe !important;
+  color: #1e40af !important;
+  font-weight: 700 !important;
+  border-radius: 0.375rem !important;
+  position: relative;
+}
+
+.rdp-day_confirmed::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  background-color: #2563eb;
+  border-radius: 50%;
+}
+
+.rdp-day_confirmed:hover {
+  background-color: #bfdbfe !important;
+  color: #1e3a8a !important;
+}
+
+.dark .rdp-day_confirmed {
+  background-color: #1e3a8a !important;
+  color: #dbeafe !important;
+}
+
+.dark .rdp-day_confirmed::after {
+  background-color: #60a5fa;
+}
+
+.dark .rdp-day_confirmed:hover {
+  background-color: #1e40af !important;
+  color: #dbeafe !important;
+}
+
+/* Days with configured time slots (green dot) */
+.rdp-day_hasSlots {
+  position: relative;
+}
+
+.rdp-day_hasSlots::before {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  background-color: #16a34a;
+  border-radius: 50%;
+}
+
+.rdp-day_hasSlots:hover {
+  background-color: #dcfce7 !important;
+  color: #166534 !important;
+}
+
+.dark .rdp-day_hasSlots::before {
+  background-color: #4ade80;
+}
+
+.dark .rdp-day_hasSlots:hover {
+  background-color: #14532d !important;
+  color: #dcfce7 !important;
+}
+
+/* Selected dates in multiple mode - more prominent styling */
+.rdp-day_selected,
+.rdp-day_selected:hover {
+  background-color: hsl(var(--primary)) !important;
+  color: hsl(var(--primary-foreground)) !important;
+  font-weight: 600 !important;
+}
+
+/* Make selected dates more visible even when they have other modifiers */
+.rdp-day_selected.rdp-day_confirmed::after,
+.rdp-day_selected.rdp-day_hasSlots::before {
+  filter: brightness(0) invert(1);
+}
+
+.dark .rdp-day_selected.rdp-day_confirmed::after,
+.dark .rdp-day_selected.rdp-day_hasSlots::before {
+  filter: brightness(0) invert(1);
 }

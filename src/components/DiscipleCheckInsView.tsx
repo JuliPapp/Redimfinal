@@ -12,6 +12,7 @@ import {
   Loader2,
   AlertCircle
 } from 'lucide-react';
+import { API_URLS } from '../utils/api';
 
 type CheckIn = {
   id: string;
@@ -97,12 +98,9 @@ export function DiscipleCheckInsView({ disciple, accessToken, projectId, onBack 
     setIsLoading(true);
     setIsWalkingAlone(false);
     try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/server/checkins/${disciple.id}`,
-        {
-          headers: { 'Authorization': `Bearer ${accessToken}` }
-        }
-      );
+      const response = await fetch(API_URLS.discipleCheckIns(disciple.id), {
+        headers: { 'Authorization': `Bearer ${accessToken}` }
+      });
 
       if (response.ok) {
         const data = await response.json();

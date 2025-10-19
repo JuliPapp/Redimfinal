@@ -8,11 +8,12 @@ type DraggableModuleProps = {
   isEditMode: boolean;
   onMove: (dragIndex: number, hoverIndex: number) => void;
   children: React.ReactNode;
+  className?: string;
 };
 
 const MODULE_TYPE = 'HOME_MODULE';
 
-export function DraggableModule({ id, index, isEditMode, onMove, children }: DraggableModuleProps) {
+export function DraggableModule({ id, index, isEditMode, onMove, children, className = '' }: DraggableModuleProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   const [{ isDragging }, drag, preview] = useDrag({
@@ -50,16 +51,15 @@ export function DraggableModule({ id, index, isEditMode, onMove, children }: Dra
     },
   });
 
-  if (isEditMode) {
-    drag(drop(ref));
-  }
+  // Always attach drag and drop to ref, but canDrag controls whether dragging is enabled
+  drag(drop(ref));
 
   return (
     <div
       ref={ref}
       className={`relative transition-opacity ${isDragging ? 'opacity-50' : 'opacity-100'} ${
         isEditMode ? 'cursor-move' : ''
-      }`}
+      } ${className}`}
       style={{ opacity: isDragging ? 0.5 : 1 }}
     >
       {isEditMode && (

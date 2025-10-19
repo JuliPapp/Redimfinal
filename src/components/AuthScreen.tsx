@@ -53,6 +53,38 @@ export function AuthScreen({ onAuthSuccess }: Props) {
     }
   }, []);
 
+  const handleInitAdmin = async () => {
+    setError(null);
+    setResetSuccess(null);
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(API_URLS.initAdmin(), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al crear usuario admin');
+      }
+
+      // Auto-fill the login form with admin credentials
+      setLoginEmail('admin@test.com');
+      setLoginPassword('30093009');
+      
+      setResetSuccess(`✅ ${data.message}. Ahora puedes iniciar sesión con: admin@test.com / 30093009`);
+    } catch (err: any) {
+      console.error('Init admin error:', err);
+      setError(err.message || 'Error al inicializar admin');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleForgotPassword = async () => {
     if (!loginEmail) {
       setError('Por favor ingresa tu email primero');
@@ -93,9 +125,16 @@ export function AuthScreen({ onAuthSuccess }: Props) {
       });
 
       if (authError) {
-        if (authError.message.includes('Invalid login')) {
-          throw new Error('Email o contraseña incorrectos');
+        console.error('Auth error details:', authError);
+        
+        if (authError.message.includes('Invalid login') || authError.message.includes('Invalid')) {
+          throw new Error('Email o contraseña incorrectos. Si es tu primera vez, regístrate usando la pestaña "Registrarse".');
         }
+        
+        if (authError.message.includes('Email not confirmed')) {
+          throw new Error('Por favor confirma tu email antes de iniciar sesión.');
+        }
+        
         throw new Error(authError.message);
       }
       
@@ -353,6 +392,23 @@ export function AuthScreen({ onAuthSuccess }: Props) {
                     {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Iniciar sesión
                   </Button>
+
+                  <div className="mt-4 p-3 bg-muted/50 rounded-lg border border-muted">
+                    <p className="text-sm text-muted-foreground mb-2">
+                      <strong>¿Primera vez?</strong> Si necesitas acceso de administrador:
+                    </p>
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={handleInitAdmin}
+                      disabled={isLoading}
+                      className="w-full"
+                    >
+                      {isLoading && <Loader2 className="mr-2 h-3 w-3 animate-spin" />}
+                      Crear usuario admin de prueba
+                    </Button>
+                  </div>
                 </form>
               </TabsContent>
 

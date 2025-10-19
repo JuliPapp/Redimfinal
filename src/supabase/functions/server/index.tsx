@@ -11,10 +11,10 @@ import * as crypto from 'node:crypto';
 import { Buffer } from 'node:buffer';
 
 // Crear app principal
-const mainApp = new Hono();
+const app = new Hono();
 
 // Middleware global - CORS y logger
-mainApp.use('*', cors({
+app.use('*', cors({
   origin: '*',
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowHeaders: ['Content-Type', 'Authorization'],
@@ -22,10 +22,33 @@ mainApp.use('*', cors({
   maxAge: 600,
   credentials: false,
 }));
-mainApp.use('*', logger(console.log));
+app.use('*', logger(console.log));
 
-// Crear sub-app para las rutas con prefijo
-const app = new Hono();
+// Debug middleware - log all incoming requests
+app.use('*', async (c, next) => {
+  console.log('🔍 INCOMING REQUEST:', {
+    method: c.req.method,
+    url: c.req.url,
+    path: c.req.path,
+    headers: Object.fromEntries(c.req.raw.headers.entries())
+  });
+  await next();
+});
+
+// Middleware to handle both paths with and without prefix
+// This allows routes to work whether called with /route or /make-server-636f4a29/route
+app.use('*', async (c, next) => {
+  const path = c.req.path;
+  const prefix = '/make-server-636f4a29';
+  
+  // If the path starts with the function prefix, register a duplicate route without it
+  if (path.startsWith(prefix)) {
+    const cleanPath = path.substring(prefix.length) || '/';
+    console.log(`🔄 Path has prefix: ${path} -> attempting to match ${cleanPath}`);
+  }
+  
+  await next();
+});
 
 const supabase = createClient(
   Deno.env.get('SUPABASE_URL')!,
@@ -947,9 +970,189 @@ app.get('/disciple/:discipleId/overview', async (c) => {
   }
 });
 
-// Health check
-app.get('/health', (c) => {
-  return c.json({ status: 'ok', timestamp: new Date().toISOString() });
+// ============================================
+// LEADER NOTES AND DISCIPLE INFO ROUTES
+// ============================================
+// Get leader notes for a specific disciple
+app.get('/make-server-636f4a29/leader-notes/:discipleId', async (c) => {
+  try {
+    console.log('✅ === GET LEADER NOTES ===');
+    const user = await verifyUser(c.req.header('Authorization'));
+    if (!user) {
+      console.log('❌ User not authorized');
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+    console.log('✅ User verified:', user.id);
+
+    const profile = await getUserProfile(user.id);
+    console.log('📋 Leader profile:', { role: profile?.role, id: profile?.id });
+    
+    if (!profile || (profile.role !== 'leader' && profile.role !== 'admin')) {
+      console.log('❌ Not a leader or admin');
+      return c.json({ error: 'Only leaders can view notes' }, 403);
+    }
+
+    const discipleId = c.req.param('discipleId');
+    console.log('🎯 Fetching notes for disciple:', discipleId);
+
+    const discipleProfile = await getUserProfile(discipleId);
+    console.log('📋 Disciple profile:', { 
+      id: discipleProfile?.id, 
+      leader_id: discipleProfile?.leader_id 
+    });
+    
+    if (!discipleProfile) {
+      console.log('❌ Disciple not found');
+      return c.json({ error: 'Disciple not found' }, 404);
+    }
+    
+    if (discipleProfile.leader_id !== user.id && profile.role !== 'admin') {
+      console.log('❌ Leader mismatch - disciple leader_id:', discipleProfile.leader_id, 'current user:', user.id);
+      return c.json({ error: 'You can only view notes for your own disciples' }, 403);
+    }
+
+    const notesKey = `leader_notes:${user.id}:${discipleId}`;
+    console.log('🔑 Notes key:', notesKey);
+    const notes = await kv.get(notesKey) || '';
+    console.log('✅ Notes retrieved, length:', typeof notes === 'string' ? notes.length : 'N/A');
+
+    return c.json({ notes });
+  } catch (error) {
+    console.error('❌ Get leader notes error:', error);
+    return c.json({ error: 'Failed to fetch notes' }, 500);
+  }
+});
+
+// Save leader notes for a specific disciple
+app.post('/make-server-636f4a29/leader-notes/:discipleId', async (c) => {
+  try {
+    console.log('=== POST LEADER NOTES ===');
+    const user = await verifyUser(c.req.header('Authorization'));
+    if (!user) {
+      console.log('❌ User not authorized');
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+
+    const profile = await getUserProfile(user.id);
+    if (!profile || (profile.role !== 'leader' && profile.role !== 'admin')) {
+      console.log('❌ Not a leader or admin');
+      return c.json({ error: 'Only leaders can edit notes' }, 403);
+    }
+
+    const discipleId = c.req.param('discipleId');
+    console.log('📝 Saving notes for disciple:', discipleId);
+
+    const discipleProfile = await getUserProfile(discipleId);
+    console.log('📋 Disciple profile:', { 
+      id: discipleProfile?.id, 
+      leader_id: discipleProfile?.leader_id 
+    });
+    
+    if (!discipleProfile) {
+      console.log('❌ Disciple not found');
+      return c.json({ error: 'Disciple not found' }, 404);
+    }
+    
+    if (discipleProfile.leader_id !== user.id && profile.role !== 'admin') {
+      console.log('❌ Leader mismatch - disciple leader_id:', discipleProfile.leader_id, 'current user:', user.id);
+      return c.json({ error: 'You can only save notes for your own disciples' }, 403);
+    }
+
+    const body = await c.req.json();
+    const { notes } = body;
+    console.log('📝 Notes to save, length:', typeof notes === 'string' ? notes.length : 'N/A');
+
+    if (notes === undefined) {
+      console.log('❌ Notes field missing');
+      return c.json({ error: 'Notes field is required' }, 400);
+    }
+
+    const notesKey = `leader_notes:${user.id}:${discipleId}`;
+    console.log('🔑 Notes key:', notesKey);
+    await kv.set(notesKey, notes);
+    console.log('✅ Notes saved successfully');
+
+    return c.json({ success: true, message: 'Notes saved successfully' });
+  } catch (error) {
+    console.error('❌ Save leader notes error:', error);
+    return c.json({ error: 'Failed to save notes' }, 500);
+  }
+});
+
+// Get disciple profile info (leader access)
+app.get('/make-server-636f4a29/disciple-info/:discipleId', async (c) => {
+  try {
+    console.log('✅ === GET DISCIPLE INFO ===');
+    const user = await verifyUser(c.req.header('Authorization'));
+    if (!user) {
+      console.log('❌ User not authorized');
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+    console.log('✅ User verified:', user.id);
+
+    const profile = await getUserProfile(user.id);
+    console.log('📋 Leader profile:', { role: profile?.role, id: profile?.id });
+    
+    if (!profile || (profile.role !== 'leader' && profile.role !== 'admin')) {
+      console.log('❌ Not a leader or admin');
+      return c.json({ error: 'Only leaders can view disciple info' }, 403);
+    }
+
+    const discipleId = c.req.param('discipleId');
+    console.log('🎯 Fetching info for disciple:', discipleId);
+
+    const discipleProfile = await getUserProfile(discipleId);
+    console.log('📋 Disciple profile:', {
+      id: discipleProfile?.id,
+      leader_id: discipleProfile?.leader_id,
+      name: discipleProfile?.name,
+      email: discipleProfile?.email
+    });
+
+    if (!discipleProfile) {
+      console.log('❌ Disciple not found');
+      return c.json({ error: 'Disciple not found' }, 404);
+    }
+
+    if (discipleProfile.leader_id !== user.id && profile.role !== 'admin') {
+      console.log('❌ Leader mismatch - disciple leader_id:', discipleProfile.leader_id, 'current user:', user.id);
+      return c.json({ error: 'You can only view info for your own disciples' }, 403);
+    }
+
+    const profileKey = `profile:${discipleId}`;
+    console.log('🔑 Profile key:', profileKey);
+    const profileData = await kv.get(profileKey) || null;
+    console.log('📄 Profile data retrieved:', profileData ? 'Yes' : 'No');
+
+    const response = {
+      profile: {
+        id: discipleProfile.id,
+        email: discipleProfile.email,
+        name: discipleProfile.name,
+        gender: discipleProfile.gender,
+        age: discipleProfile.age,
+        created_at: discipleProfile.created_at
+      },
+      profileData 
+    };
+    console.log('✅ Returning disciple info');
+
+    return c.json(response);
+  } catch (error) {
+    console.error('❌ Get disciple info error:', error);
+    return c.json({ error: 'Failed to fetch disciple info' }, 500);
+  }
+});
+
+console.log('✅ Leader notes and disciple info routes registered with full path:');
+console.log('   - GET  /make-server-636f4a29/leader-notes/:discipleId');
+console.log('   - POST /make-server-636f4a29/leader-notes/:discipleId');
+console.log('   - GET  /make-server-636f4a29/disciple-info/:discipleId');
+
+// Test route to verify routing is working
+app.get('/test-route', (c) => {
+  console.log('✅ TEST ROUTE HIT');
+  return c.json({ message: 'Test route working!' });
 });
 
 // ============================================
@@ -1464,30 +1667,101 @@ app.get('/leader-time-slots/:leaderId', async (c) => {
 
 // Add time slot (leader only)
 app.post('/time-slots', async (c) => {
+  console.log('🎯 POST /time-slots iniciado');
+  
   try {
-    const user = await verifyUser(c.req.header('Authorization'));
+    console.log('🔐 Verificando autenticación...');
+    const authHeader = c.req.header('Authorization');
+    console.log('🔐 Authorization header:', authHeader ? 'Present' : 'Missing');
+    
+    const user = await verifyUser(authHeader);
     if (!user) {
+      console.error('❌ Usuario no autenticado');
       return c.json({ error: 'Unauthorized' }, 401);
     }
+    console.log('✅ Usuario autenticado:', user.id);
 
     const profile = await getUserProfile(user.id);
+    console.log('👤 Perfil del usuario:', profile);
+    
     if (!profile || (profile.role !== 'leader' && profile.role !== 'admin')) {
+      console.error('❌ Usuario no es líder');
       return c.json({ error: 'Only leaders can add time slots' }, 403);
     }
+    console.log('✅ Usuario es líder/admin');
 
-    const body = await c.req.json();
-    const { day, start_time, end_time } = body;
-
-    if (!day || !start_time || !end_time) {
-      return c.json({ error: 'Missing required fields' }, 400);
+    console.log('📦 Intentando parsear body...');
+    let body;
+    try {
+      body = await c.req.json();
+      console.log('✅ Body parseado exitosamente');
+    } catch (parseError) {
+      console.error('❌ Error parseando JSON:', parseError);
+      return c.json({ error: 'Invalid JSON body', details: String(parseError) }, 400);
     }
+    
+    console.log('📨 Body recibido:', JSON.stringify(body, null, 2));
+    console.log('📨 Keys del body:', Object.keys(body));
+    console.log('📨 Body completo raw:', body);
+    
+    const date = body.date;
+    const start_time = body.start_time;
+    const end_time = body.end_time;
+    
+    console.log('🔍 Extrayendo campos...');
+    console.log('  - date:', date, '(tipo:', typeof date, ', valor:', JSON.stringify(date), ')');
+    console.log('  - start_time:', start_time, '(tipo:', typeof start_time, ', valor:', JSON.stringify(start_time), ')');
+    console.log('  - end_time:', end_time, '(tipo:', typeof end_time, ', valor:', JSON.stringify(end_time), ')');
+    
+    // Validación estricta
+    const isMissing = (val: any) => val === undefined || val === null || val === '';
+    
+    if (isMissing(date) || isMissing(start_time) || isMissing(end_time)) {
+      const missing = [];
+      if (isMissing(date)) missing.push('date');
+      if (isMissing(start_time)) missing.push('start_time');
+      if (isMissing(end_time)) missing.push('end_time');
+      
+      console.error('❌ Campos faltantes o vacíos:', missing);
+      console.error('❌ Body completo que causó error:', JSON.stringify(body, null, 2));
+      console.error('❌ Valores extraídos:', { date, start_time, end_time });
+      console.error('❌ Tipos:', { 
+        date: typeof date, 
+        start_time: typeof start_time, 
+        end_time: typeof end_time 
+      });
+      
+      return c.json({ 
+        error: 'Missing required fields', 
+        missing,
+        received: body,
+        keys: Object.keys(body),
+        values: { date, start_time, end_time },
+        types: { 
+          date: typeof date, 
+          start_time: typeof start_time, 
+          end_time: typeof end_time 
+        }
+      }, 400);
+    }
+    
+    console.log('✅ Todos los campos presentes');
 
     const key = `time_slots:${user.id}`;
     const slots = (await kv.get(key)) || [];
     
+    // Check if slot already exists for this date and time
+    const exists = slots.some((s: any) => 
+      s.date === date && s.start_time === start_time && s.end_time === end_time
+    );
+    
+    if (exists) {
+      return c.json({ error: 'Time slot already exists for this date and time' }, 400);
+    }
+    
     const newSlot = {
       id: crypto.randomUUID(),
-      day,
+      date,
       start_time,
       end_time,
       is_available: true
@@ -1559,6 +1833,30 @@ app.post('/request-meeting', async (c) => {
     );
     await kv.set(slotsKey, updatedSlots);
 
+    // Calculate next occurrence of this day
+    const dayMap: { [key: string]: number } = {
+      'sunday': 0, 'monday': 1, 'tuesday': 2, 'wednesday': 3,
+      'thursday': 4, 'friday': 5, 'saturday': 6
+    };
+    
+    const today = new Date();
+    const targetDay = dayMap[slot.day.toLowerCase()];
+    const currentDay = today.getDay();
+    
+    let daysUntilTarget = targetDay - currentDay;
+    if (daysUntilTarget <= 0) {
+      daysUntilTarget += 7; // Next week
+    }
+    
+    const meetingDate = new Date(today);
+    meetingDate.setDate(today.getDate() + daysUntilTarget);
+    const formattedDate = meetingDate.toLocaleDateString('es-ES', { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+
     // Create meeting
     const meetingId = crypto.randomUUID();
     const meeting = {
@@ -1567,7 +1865,9 @@ app.post('/request-meeting', async (c) => {
       disciple_name: profile.name,
       leader_id,
       time_slot_id,
+      date: formattedDate,
       day: slot.day,
+      time: `${slot.start_time} - ${slot.end_time}`,
       start_time: slot.start_time,
       end_time: slot.end_time,
       status: 'pending',
@@ -1609,8 +1909,8 @@ app.get('/meetings', async (c) => {
     // Format meetings for display
     const formattedMeetings = meetings.map((m: any) => ({
       id: m.id,
-      date: m.day,
-      time: `${m.start_time} - ${m.end_time}`,
+      date: m.date || m.day, // Support both new (date) and old (day) format
+      time: m.time || `${m.start_time} - ${m.end_time}`,
       status: m.status,
       leader_name: m.leader_name,
       disciple_name: m.disciple_name,
@@ -2798,9 +3098,220 @@ app.delete('/admin/files/:fileId', async (c) => {
   }
 });
 
-// Catch-all for undefined routes
+// ============================================
+// DISCIPLE PROFILE ROUTES
+// ============================================
+
+// Get disciple profile
+app.get('/disciple-profile', async (c) => {
+  try {
+    const user = await verifyUser(c.req.header('Authorization'));
+    if (!user) {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+
+    const profileKey = `profile:${user.id}`;
+    const profile = await kv.get(profileKey);
+
+    return c.json({ 
+      profile: profile || {
+        is_member: false,
+        service_areas: [],
+        has_gifts: false,
+        gifts: [],
+        is_studying: false
+      }
+    });
+  } catch (error) {
+    console.error('Error getting disciple profile:', error);
+    return c.json({ error: 'Failed to get profile' }, 500);
+  }
+});
+
+// Update disciple profile
+app.post('/disciple-profile', async (c) => {
+  try {
+    const user = await verifyUser(c.req.header('Authorization'));
+    if (!user) {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+
+    const body = await c.req.json();
+    const { is_member, service_areas, has_gifts, gifts, is_studying } = body;
+
+    // Validate data
+    if (typeof is_member !== 'boolean') {
+      return c.json({ error: 'is_member must be a boolean' }, 400);
+    }
+
+    if (!Array.isArray(service_areas)) {
+      return c.json({ error: 'service_areas must be an array' }, 400);
+    }
+
+    if (typeof has_gifts !== 'boolean') {
+      return c.json({ error: 'has_gifts must be a boolean' }, 400);
+    }
+
+    if (!Array.isArray(gifts)) {
+      return c.json({ error: 'gifts must be an array' }, 400);
+    }
+
+    if (typeof is_studying !== 'boolean') {
+      return c.json({ error: 'is_studying must be a boolean' }, 400);
+    }
+
+    const profileData = {
+      is_member,
+      service_areas,
+      has_gifts,
+      gifts: has_gifts ? gifts : [],
+      is_studying,
+      updated_at: new Date().toISOString()
+    };
+
+    const profileKey = `profile:${user.id}`;
+    await kv.set(profileKey, profileData);
+
+    console.log(`Profile updated for user ${user.id}:`, profileData);
+
+    return c.json({ 
+      success: true,
+      profile: profileData
+    });
+  } catch (error) {
+    console.error('Error updating disciple profile:', error);
+    return c.json({ error: 'Failed to update profile' }, 500);
+  }
+});
+
+// Initialize admin user endpoint
+app.post('/auth/init-admin', async (c) => {
+  try {
+    const adminEmail = 'admin@test.com';
+    const adminPassword = '30093009';
+    const adminName = 'ADMIN';
+
+    // Check if admin already exists
+    const { data: existingUser } = await supabase.auth.admin.listUsers();
+    const adminExists = existingUser?.users?.some(u => u.email === adminEmail);
+
+    if (adminExists) {
+      return c.json({ 
+        success: true, 
+        message: 'Admin user already exists',
+        email: adminEmail
+      });
+    }
+
+    // Create admin user
+    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+      email: adminEmail,
+      password: adminPassword,
+      email_confirm: true,
+      user_metadata: { name: adminName }
+    });
+
+    if (authError) {
+      console.error('Error creating admin user:', authError);
+      return c.json({ error: authError.message }, 400);
+    }
+
+    // Create admin profile
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .insert({
+        id: authData.user.id,
+        email: adminEmail,
+        name: adminName,
+        role: 'admin',
+        leader_id: null
+      });
+
+    if (profileError) {
+      console.error('Error creating admin profile:', profileError);
+      return c.json({ error: 'Failed to create admin profile' }, 500);
+    }
+
+    console.log('✅ Admin user created successfully');
+    return c.json({ 
+      success: true, 
+      message: 'Admin user created successfully',
+      email: adminEmail,
+      password: adminPassword
+    });
+  } catch (error: any) {
+    console.error('Init admin error:', error);
+    return c.json({ error: error.message || 'Internal server error' }, 500);
+  }
+});
+
+// ==================== MODULE CONFIG ROUTES ====================
+
+// Get user's module configuration
+app.get('/module-config', async (c) => {
+  try {
+    const user = await verifyUser(c.req.header('Authorization'));
+    if (!user) {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+
+    const configKey = `module_config:${user.id}`;
+    const config = await kv.get(configKey);
+    
+    console.log(`📖 GET module-config for user ${user.id}:`, config);
+    
+    if (!config) {
+      console.log('⚠️ No config found, returning null');
+      return c.json({ config: null }, 200);
+    }
+
+    return c.json({ config }, 200);
+  } catch (error: any) {
+    console.error('❌ Error getting module config:', error);
+    return c.json({ error: error.message }, 500);
+  }
+});
+
+// Save user's module configuration
+app.post('/module-config', async (c) => {
+  try {
+    const user = await verifyUser(c.req.header('Authorization'));
+    if (!user) {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+
+    const body = await c.req.json();
+    const { config } = body;
+
+    console.log(`💾 POST module-config for user ${user.id}:`, JSON.stringify(config));
+
+    if (!config || !Array.isArray(config)) {
+      console.error('❌ Invalid config format received');
+      return c.json({ error: 'Invalid config format' }, 400);
+    }
+
+    const configKey = `module_config:${user.id}`;
+    await kv.set(configKey, config);
+    
+    console.log(`✅ Config saved successfully for user ${user.id}`);
+
+    return c.json({ success: true, message: 'Configuration saved' }, 200);
+  } catch (error: any) {
+    console.error('❌ Error saving module config:', error);
+    return c.json({ error: error.message }, 500);
+  }
+});
+
+// Log all registered routes for debugging
+console.log('🔍 SERVER INITIALIZED');
+console.log('✅ Routes with prefix registered:');
+console.log('   - GET /leader-notes/:discipleId');
+console.log('   - POST /leader-notes/:discipleId');
+console.log('   - GET /disciple-info/:discipleId');
+
+// Catch-all for undefined routes - MUST BE LAST
 app.all('*', (c) => {
-  console.log('404 - Route not found:', c.req.method, c.req.url);
+  console.log('❌ 404 - Route not found:', c.req.method, c.req.url, 'path:', c.req.path);
   return c.json({ 
     error: 'Route not found',
     method: c.req.method,
@@ -2808,18 +3319,5 @@ app.all('*', (c) => {
   }, 404);
 });
 
-// Montar la sub-app en el prefijo de Supabase
-mainApp.route('/make-server-636f4a29', app);
-
-// Health check en la raíz (sin prefijo)
-mainApp.get('/', (c) => {
-  console.log('=== ROOT ACCESSED ===');
-  return c.json({ 
-    status: 'ok',
-    message: 'Camino de Restauración API',
-    timestamp: new Date().toISOString(),
-    routes_prefix: '/make-server-636f4a29'
-  });
-});
-
-Deno.serve(mainApp.fetch);
+// Start the server
+Deno.serve(app.fetch);

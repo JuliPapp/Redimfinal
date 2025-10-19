@@ -17,11 +17,13 @@ export const API_URLS = {
   // Auth
   profile: () => getApiUrl('auth/profile'),
   signup: () => getApiUrl('auth/signup'),
+  initAdmin: () => getApiUrl('auth/init-admin'),
   
   // Check-ins
   checkins: () => getApiUrl('checkins'),
   checkinsStats: () => getApiUrl('checkins-stats'),
   discipleCheckins: (discipleId: string) => getApiUrl(`checkins/${discipleId}`),
+  discipleCheckIns: (discipleId: string) => getApiUrl(`checkins/${discipleId}`),
   changeMode: () => getApiUrl('change-mode'),
   
   // Conversational Check-in
@@ -42,6 +44,8 @@ export const API_URLS = {
   leaderStats: () => getApiUrl('leader-stats'),
   assignDisciple: () => getApiUrl('assign-disciple'),
   unassignDisciple: () => getApiUrl('unassign-disciple'),
+  leaderNotes: (discipleId: string) => getApiUrl(`leader-notes/${discipleId}`),
+  discipleInfo: (discipleId: string) => getApiUrl(`disciple-info/${discipleId}`),
   
   // Meetings
   timeSlots: () => getApiUrl('time-slots'),
@@ -66,4 +70,12 @@ export const API_URLS = {
   adminFiles: () => getApiUrl('admin/files'),
   uploadPdf: () => getApiUrl('admin/upload-pdf'),
   deleteFile: (fileId: string) => getApiUrl(`admin/files/${fileId}`),
+  
+  // Disciple Profile
+  discipleProfile: () => getApiUrl('disciple-profile'),
+  updateDiscipleProfile: () => getApiUrl('disciple-profile'),
+  
+  // Module Configuration
+  moduleConfig: () => getApiUrl('module-config'),
+  saveModuleConfig: () => getApiUrl('module-config'),
 };

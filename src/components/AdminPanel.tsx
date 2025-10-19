@@ -68,14 +68,11 @@ export function AdminPanel({ accessToken, projectId, onBack }: AdminPanelProps) 
   const loadFiles = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/server/admin/files`,
-        {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`
-          }
+      const response = await fetch(API_URLS.adminFiles(), {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
         }
-      );
+      });
 
       if (response.ok) {
         const data = await response.json();
@@ -115,16 +112,13 @@ export function AdminPanel({ accessToken, projectId, onBack }: AdminPanelProps) 
     formData.append('file', file);
 
     try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/server/admin/upload-pdf`,
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${accessToken}`
-          },
-          body: formData
-        }
-      );
+      const response = await fetch(API_URLS.uploadPdf(), {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        },
+        body: formData
+      });
 
       if (response.ok) {
         const data = await response.json();
@@ -160,15 +154,12 @@ export function AdminPanel({ accessToken, projectId, onBack }: AdminPanelProps) 
     }
 
     try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/server/admin/files/${fileId}`,
-        {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${accessToken}`
-          }
+      const response = await fetch(API_URLS.deleteFile(fileId), {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
         }
-      );
+      });
 
       if (response.ok) {
         toast.success(`Archivo "${filename}" eliminado`);

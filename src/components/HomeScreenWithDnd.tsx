@@ -10,6 +10,7 @@ type Props = {
   onStartCheckIn: () => void;
   onViewHistory?: () => void;
   onViewResources?: () => void;
+  onViewProfile?: () => void;
   onLogout: () => void;
   onModeChange?: (newMode: 'personal' | 'community') => void;
   onThemeToggle?: () => void;

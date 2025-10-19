@@ -1,27 +1,28 @@
 import { useState, useEffect } from 'react';
 import { Button } from './ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Alert, AlertDescription } from './ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { MeetingScheduler } from './MeetingScheduler';
 import { DiscipleCheckInsView } from './DiscipleCheckInsView';
+import { DiscipleProfileView } from './DiscipleProfileView';
 import { ThemeToggle } from './ThemeToggle';
 import { 
-  Users, 
-  TrendingUp, 
-  AlertCircle,
-  Calendar,
   LogOut,
   Eye,
-  UserPlus,
   UserMinus,
   BookOpen,
   Loader2,
-  Settings
+  RefreshCw,
+  Moon,
+  Sun,
+  Clock,
+  Video,
+  User
 } from 'lucide-react';
 import { toast } from 'sonner@2.0.3';
 import { API_URLS } from '../utils/api';
+import svgPaths from '../imports/svg-rtshddnzq9';
 
 type Disciple = {
   id: string;
@@ -37,52 +38,36 @@ type Props = {
   theme?: 'light' | 'dark';
   onLogout: () => void;
   onViewLibrary?: () => void;
-  onViewAdminPanel?: () => void;
-  onViewDisciple?: (discipleId: string) => void;
   onThemeToggle?: () => void;
 };
 
-export function LeaderDashboard({ leaderName, accessToken, projectId, theme = 'light', onLogout, onViewLibrary, onViewAdminPanel, onThemeToggle }: Props) {
+export function LeaderDashboard({ 
+  leaderName, 
+  accessToken, 
+  projectId, 
+  theme = 'light', 
+  onLogout, 
+  onViewLibrary, 
+  onThemeToggle 
+}: Props) {
   const [disciples, setDisciples] = useState<Disciple[]>([]);
-  const [pendingRequests, setPendingRequests] = useState<Disciple[]>([]);
   const [availableDisciples, setAvailableDisciples] = useState<Disciple[]>([]);
+  const [pendingRequests, setPendingRequests] = useState<Disciple[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isLoadingAvailable, setIsLoadingAvailable] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState('my-disciples');
-  const [isLegacyMode, setIsLegacyMode] = useState(false);
   const [selectedDisciple, setSelectedDisciple] = useState<Disciple | null>(null);
-  const [viewMode, setViewMode] = useState<'checkins' | null>(null);
-  const [leaderStats, setLeaderStats] = useState<{
-    totalCheckIns: number;
-    checkInsThisWeek: number;
-    avgIntensity: number;
-    trend: number;
-  } | null>(null);
+  const [viewMode, setViewMode] = useState<'checkins' | 'profile' | null>(null);
 
   useEffect(() => {
     fetchDisciples();
+    fetchAvailableDisciples();
     fetchPendingRequests();
-    fetchLeaderStats();
   }, []);
-
-  useEffect(() => {
-    if (activeTab === 'available') {
-      fetchAvailableDisciples();
-    } else if (activeTab === 'pending') {
-      fetchPendingRequests();
-    }
-  }, [activeTab]);
 
   const fetchDisciples = async () => {
     setIsLoading(true);
-    setError(null);
-    
     try {
       const response = await fetch(API_URLS.disciples(), {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`
-        }
+        headers: { 'Authorization': `Bearer ${accessToken}` }
       });
 
       if (!response.ok) {
@@ -93,18 +78,33 @@ export function LeaderDashboard({ leaderName, accessToken, projectId, theme = 'l
       setDisciples(data.disciples || []);
     } catch (err: any) {
       console.error('Error fetching disciples:', err);
-      setError(err.message || 'Error al cargar discípulos');
+      toast.error(err.message || 'Error al cargar discípulos');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchAvailableDisciples = async () => {
+    try {
+      const response = await fetch(API_URLS.availableDisciples(), {
+        headers: { 'Authorization': `Bearer ${accessToken}` }
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al cargar discípulos disponibles');
+      }
+
+      const data = await response.json();
+      setAvailableDisciples(data.availableDisciples || []);
+    } catch (err: any) {
+      console.error('Error fetching available disciples:', err);
     }
   };
 
   const fetchPendingRequests = async () => {
     try {
       const response = await fetch(API_URLS.pendingRequests(), {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`
-        }
+        headers: { 'Authorization': `Bearer ${accessToken}` }
       });
 
       if (!response.ok) {
@@ -113,523 +113,529 @@ export function LeaderDashboard({ leaderName, accessToken, projectId, theme = 'l
 
       const data = await response.json();
       setPendingRequests(data.pendingRequests || []);
-      if (data.legacyMode) {
-        setIsLegacyMode(true);
-      }
     } catch (err: any) {
       console.error('Error fetching pending requests:', err);
     }
   };
 
-  const fetchAvailableDisciples = async () => {
-    setIsLoadingAvailable(true);
-    
-    try {
-      const response = await fetch(API_URLS.availableDisciples(), {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Error al cargar usuarios disponibles');
-      }
-
-      const data = await response.json();
-      setAvailableDisciples(data.availableDisciples || []);
-    } catch (err: any) {
-      console.error('Error fetching available disciples:', err);
-      toast.error(err.message || 'Error al cargar usuarios disponibles');
-    } finally {
-      setIsLoadingAvailable(false);
-    }
-  };
-
-  const fetchLeaderStats = async () => {
-    try {
-      const response = await fetch(API_URLS.leaderStats(), {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`
-        }
-        }
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        setLeaderStats({
-          totalCheckIns: data.totalCheckIns || 0,
-          checkInsThisWeek: data.checkInsThisWeek || 0,
-          avgIntensity: data.avgIntensity || 0,
-          trend: data.trend || 0
-        });
-      }
-    } catch (err: any) {
-      console.error('Error fetching leader stats:', err);
-    }
-  };
-
-  const handleAssignDisciple = async (discipleId: string) => {
-    try {
-      const response = await fetch(API_URLS.assignDisciple(), {
-        method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${accessToken}`
-          },
-          body: JSON.stringify({ discipleId })
-        }
-      );
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Error al asignar discípulo');
-      }
-
-      toast.success('Solicitud enviada exitosamente');
-      
-      // Refresh all lists
-      await fetchDisciples();
-      await fetchPendingRequests();
-      await fetchAvailableDisciples();
-    } catch (err: any) {
-      console.error('Error assigning disciple:', err);
-      toast.error(err.message || 'Error al asignar discípulo');
-    }
-  };
-
   const handleUnassignDisciple = async (discipleId: string) => {
-    if (!confirm('¿Estás seguro de que deseas dejar de acompañar a este discípulo?')) {
+    if (!confirm('¿Estás seguro de que quieres desasignar a este discípulo?')) {
       return;
     }
 
     try {
       const response = await fetch(API_URLS.unassignDisciple(), {
         method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${accessToken}`
-          },
-          body: JSON.stringify({ discipleId })
-        }
-      );
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}` 
+        },
+        body: JSON.stringify({ discipleId })
+      });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Error al desasignar discípulo');
+        throw new Error('Error al desasignar discípulo');
       }
 
-      toast.success('Solicitud cancelada exitosamente');
-      
-      // Refresh all lists
+      toast.success('Discípulo desasignado exitosamente');
       await fetchDisciples();
-      await fetchPendingRequests();
       await fetchAvailableDisciples();
+      await fetchPendingRequests();
     } catch (err: any) {
       console.error('Error unassigning disciple:', err);
       toast.error(err.message || 'Error al desasignar discípulo');
     }
   };
 
-  const today = new Date();
-  const greeting = () => {
-    const hour = today.getHours();
+  const handleAssignDisciple = async (discipleId: string) => {
+    if (!confirm('¿Quieres enviar una solicitud de acompañamiento a este discípulo?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(API_URLS.assignDisciple(), {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}` 
+        },
+        body: JSON.stringify({ discipleId })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Error al enviar solicitud');
+      }
+
+      toast.success('Solicitud enviada exitosamente');
+      await fetchDisciples();
+      await fetchAvailableDisciples();
+      await fetchPendingRequests();
+    } catch (err: any) {
+      console.error('Error assigning disciple:', err);
+      toast.error(err.message || 'Error al enviar solicitud');
+    }
+  };
+
+  const handleCancelRequest = async (discipleId: string) => {
+    if (!confirm('¿Estás seguro de que quieres cancelar esta solicitud?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(API_URLS.unassignDisciple(), {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}` 
+        },
+        body: JSON.stringify({ discipleId })
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al cancelar solicitud');
+      }
+
+      toast.success('Solicitud cancelada exitosamente');
+      await fetchDisciples();
+      await fetchAvailableDisciples();
+      await fetchPendingRequests();
+    } catch (err: any) {
+      console.error('Error cancelling request:', err);
+      toast.error(err.message || 'Error al cancelar solicitud');
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const monthNames = [
+      'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+      'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+    ];
+    const month = monthNames[date.getMonth()];
+    const year = date.getFullYear();
+    return `Desde ${day} de ${month} de ${year}`;
+  };
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
     if (hour < 12) return 'Buenos días';
-    if (hour < 18) return 'Buenas tardes';
+    if (hour < 19) return 'Buenas tardes';
     return 'Buenas noches';
   };
 
-  // If viewing a disciple's check-ins, show that view
-  if (selectedDisciple && viewMode === 'checkins') {
+  if (viewMode === 'checkins' && selectedDisciple) {
     return (
-      <DiscipleCheckInsView
-        disciple={selectedDisciple}
-        accessToken={accessToken}
-        projectId={projectId}
-        onBack={() => {
-          setSelectedDisciple(null);
-          setViewMode(null);
-          // Refresh disciples list in case the disciple changed to personal mode
-          fetchDisciples();
-        }}
-      />
+      <div className="min-h-screen bg-[#fdfcfb] p-8">
+        <div className="max-w-5xl mx-auto">
+          <DiscipleCheckInsView
+            disciple={selectedDisciple}
+            accessToken={accessToken}
+            projectId={projectId}
+            onBack={() => {
+              setViewMode(null);
+              setSelectedDisciple(null);
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  if (viewMode === 'profile' && selectedDisciple) {
+    console.log('🔍 Rendering DiscipleProfileView for:', selectedDisciple);
+    return (
+      <div className="min-h-screen bg-[#fdfcfb] dark:bg-[#1a1a1a] p-8">
+        <div className="max-w-5xl mx-auto">
+          <DiscipleProfileView
+            discipleId={selectedDisciple.id}
+            discipleName={selectedDisciple.name}
+            accessToken={accessToken}
+            onBack={() => {
+              console.log('📤 Going back from DiscipleProfileView');
+              setViewMode(null);
+              setSelectedDisciple(null);
+            }}
+          />
+        </div>
+      </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="border-b border-border bg-card">
-        <div className="container max-w-4xl mx-auto px-4 py-6">
+    <div className="min-h-screen bg-[#fdfcfb] dark:bg-[#1a1a1a] relative">
+      {/* Header fijo */}
+      <div className="absolute bg-[#fdfcfe] dark:bg-[#242424] left-0 top-0 w-full border-b border-[#e5dfe8] dark:border-[#333333] z-10">
+        <div className="max-w-[1135px] mx-auto px-[135px] py-6">
           <div className="flex items-center justify-between">
-            <div className="flex-1">
-              <div className="flex items-center gap-3">
-                <h1>{greeting()}, {leaderName}</h1>
-                <Badge variant="secondary" className="bg-primary/10 text-primary">
-                  Líder
-                </Badge>
-              </div>
-              <p className="text-muted-foreground">
-                Panel de acompañamiento • Tu cuenta fue configurada como líder
+            {/* Saludo y badge */}
+            <div className="flex items-center gap-3">
+              <p className="font-['Inter'] font-normal leading-[24px] text-[#2d3748] dark:text-[#e5e5e5] text-[16px] tracking-[-0.3125px]">
+                {getGreeting()}, {leaderName}
               </p>
+              <div className="bg-[rgba(126,179,213,0.1)] dark:bg-[rgba(126,179,213,0.2)] h-[21.811px] rounded-[10px] px-2 py-1">
+                <p className="font-['Inter'] font-medium leading-[16px] text-[#7eb3d5] dark:text-[#8ec5e6] text-[12px]">
+                  Líder
+                </p>
+              </div>
             </div>
-            <div className="flex gap-2">
-              {onViewAdminPanel && (
-                <Button variant="default" onClick={onViewAdminPanel}>
-                  <Settings className="w-4 h-4 mr-2" />
-                  Admin Panel
-                </Button>
-              )}
+
+            {/* Botones de acciones */}
+            <div className="flex items-center gap-2">
+              {/* Botón Biblioteca */}
               {onViewLibrary && (
-                <Button variant="outline" onClick={onViewLibrary}>
-                  <BookOpen className="w-4 h-4 mr-2" />
-                  Biblioteca
-                </Button>
+                <button
+                  onClick={onViewLibrary}
+                  className="bg-[#fdfcfb] dark:bg-[#2a2a2a] h-[35.994px] rounded-[10px] border border-[#e5dfe8] dark:border-[#333333] px-3 flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-[#333333] transition-colors"
+                >
+                  <svg className="block size-[15.994px]" fill="none" preserveAspectRatio="none" viewBox="0 0 16 16">
+                    <g clipPath="url(#clip0_biblioteca)" id="Icon">
+                      <path d="M7.99716 4.66501V13.995" stroke="currentColor" className="text-[#2D3748] dark:text-[#e5e5e5]" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.33286" />
+                      <path d={svgPaths.pd5f2f00} stroke="currentColor" className="text-[#2D3748] dark:text-[#e5e5e5]" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.33286" />
+                    </g>
+                    <defs>
+                      <clipPath id="clip0_biblioteca">
+                        <rect fill="white" height="15.9943" width="15.9943" />
+                      </clipPath>
+                    </defs>
+                  </svg>
+                  <span className="font-['Inter'] font-medium leading-[20px] text-[#2d3748] dark:text-[#e5e5e5] text-[14px] tracking-[-0.1504px]">
+                    Biblioteca
+                  </span>
+                </button>
               )}
-              {onThemeToggle && <ThemeToggle theme={theme} onToggle={onThemeToggle} />}
-              <Button variant="ghost" size="icon" onClick={onLogout} title="Cerrar sesión">
-                <LogOut className="w-5 h-5" />
-              </Button>
+
+              {/* Botón tema */}
+              {onThemeToggle && (
+                <button
+                  onClick={onThemeToggle}
+                  className="rounded-[10px] size-[35.994px] flex items-center justify-center hover:bg-gray-100 dark:hover:bg-[#333333] transition-colors"
+                >
+                  {theme === 'dark' ? (
+                    <Sun className="w-[15.994px] h-[15.994px] text-[#2D3748] dark:text-[#e5e5e5]" />
+                  ) : (
+                    <Moon className="w-[15.994px] h-[15.994px] text-[#2D3748] dark:text-[#e5e5e5]" />
+                  )}
+                </button>
+              )}
+
+              {/* Botón logout */}
+              <button
+                onClick={onLogout}
+                className="rounded-[10px] size-[35.994px] flex items-center justify-center hover:bg-gray-100 dark:hover:bg-[#333333] transition-colors"
+              >
+                <svg className="block size-[15.994px]" fill="none" preserveAspectRatio="none" viewBox="0 0 16 16">
+                  <g id="Icon">
+                    <path d={svgPaths.p3a68dbc0} stroke="currentColor" className="text-[#2D3748] dark:text-[#e5e5e5]" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.33286" />
+                    <path d="M13.995 7.99716H5.99787" stroke="currentColor" className="text-[#2D3748] dark:text-[#e5e5e5]" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.33286" />
+                    <path d={svgPaths.p1f15eec0} stroke="currentColor" className="text-[#2D3748] dark:text-[#e5e5e5]" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.33286" />
+                  </g>
+                </svg>
+              </button>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="container max-w-4xl mx-auto p-4 py-8 space-y-6">
-        {/* Legacy Mode Warning */}
-        {isLegacyMode && (
-          <Alert>
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              <strong>Modo de compatibilidad activado:</strong> El sistema de solicitudes no está disponible porque falta la migración de base de datos. 
-              Las asignaciones se harán directamente sin confirmación del discípulo. 
-              Para habilitar el sistema de solicitudes, ejecuta el SQL en <code>DATABASE_MIGRATION.md</code>
-            </AlertDescription>
-          </Alert>
-        )}
-
-        {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2">
-                <Users className="w-4 h-4" />
-                Mis Discípulos
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-muted-foreground">{disciples.length} personas</div>
-              <p className="text-muted-foreground mt-2">
-                Acompañando en su proceso
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
-                Pendientes
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-muted-foreground">{pendingRequests.length} solicitudes</div>
-              <p className="text-muted-foreground mt-2">
-                Esperando confirmación
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="w-4 h-4" />
-                Progreso Semanal
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {leaderStats ? (
-                <>
-                  <div className="flex items-baseline gap-2">
-                    <div className="text-3xl">{leaderStats.checkInsThisWeek}</div>
-                    {leaderStats.trend !== 0 && (
-                      <Badge variant={leaderStats.trend > 0 ? "default" : "secondary"} className="text-xs">
-                        {leaderStats.trend > 0 ? '+' : ''}{leaderStats.trend}%
-                      </Badge>
-                    )}
-                  </div>
-                  <p className="text-muted-foreground mt-2">
-                    Check-ins esta semana
+      {/* Contenido principal */}
+      <div className="max-w-[896px] mx-auto px-4 pt-[116px] pb-8">
+        <div className="flex flex-col gap-6">
+          
+          {/* Card 1: Mis Discípulos */}
+          <div className="bg-[#fdfcfe] dark:bg-[#242424] rounded-[16px] border-[0.909px] border-[#e5dfe8] dark:border-[#333333]">
+            <div className="p-6">
+              {/* Header con título y botón actualizar */}
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                  <p className="font-['Inter'] font-medium leading-[16px] text-[#2d3748] dark:text-[#e5e5e5] text-[16px] tracking-[-0.3125px] mb-2">
+                    Mis discípulos
                   </p>
-                  {leaderStats.avgIntensity > 0 && (
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Intensidad promedio: {leaderStats.avgIntensity}/10
-                    </p>
-                  )}
-                </>
-              ) : (
-                <>
-                  <div className="text-muted-foreground">--</div>
-                  <p className="text-muted-foreground mt-2">Cargando...</p>
-                </>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Tabs for disciples */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="my-disciples">
-              Confirmados ({disciples.length})
-            </TabsTrigger>
-            <TabsTrigger value="pending">
-              Pendientes ({pendingRequests.length})
-            </TabsTrigger>
-            <TabsTrigger value="available">
-              Disponibles ({availableDisciples.length})
-            </TabsTrigger>
-            <TabsTrigger value="meetings">
-              Reuniones
-            </TabsTrigger>
-          </TabsList>
-
-          {/* My Disciples Tab */}
-          <TabsContent value="my-disciples" className="mt-6">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle>Mis discípulos</CardTitle>
-                    <CardDescription>
-                      Personas que estás acompañando en su proceso de restauración
-                    </CardDescription>
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => fetchDisciples()}
-                    disabled={isLoading}
-                  >
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Actualizando...
-                      </>
-                    ) : (
-                      'Actualizar'
-                    )}
-                  </Button>
+                  <p className="font-['Inter'] font-normal leading-[24px] text-[#5a6c6d] dark:text-[#a3a3a3] text-[16px] tracking-[-0.3125px]">
+                    Personas que estás acompañando en su proceso de restauración
+                  </p>
                 </div>
-              </CardHeader>
-              <CardContent>
-                {isLoading ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    Cargando...
-                  </div>
-                ) : error ? (
-                  <Alert variant="destructive">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>{error}</AlertDescription>
-                  </Alert>
-                ) : disciples.length === 0 ? (
-                  <div className="text-center py-8 space-y-4">
-                    <Users className="w-12 h-12 text-muted-foreground mx-auto" />
-                    <div>
-                      <div className="mb-1">Aún no tienes discípulos asignados</div>
-                      <p className="text-muted-foreground">
-                        Ve a la pestaña "Disponibles" para asignarte discípulos
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {disciples.map((disciple) => (
-                      <div
-                        key={disciple.id}
-                        className="flex items-center justify-between p-4 rounded-lg border border-border hover:border-primary/50 transition-colors"
-                      >
-                        <div className="flex-1">
-                          <div className="mb-1">{disciple.name}</div>
-                          <p className="text-muted-foreground">
-                            {disciple.email}
-                          </p>
-                          <p className="text-muted-foreground mt-1">
-                            Desde {new Date(disciple.created_at).toLocaleDateString('es-ES', {
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric'
-                            })}
-                          </p>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              setSelectedDisciple(disciple);
-                              setViewMode('checkins');
-                            }}
-                          >
-                            <Eye className="w-4 h-4 mr-2" />
-                            Ver check-ins
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleUnassignDisciple(disciple.id)}
-                          >
-                            <UserMinus className="w-4 h-4 mr-2" />
-                            Desasignar
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
+                <button
+                  onClick={() => {
+                    fetchDisciples();
+                    fetchAvailableDisciples();
+                    fetchPendingRequests();
+                  }}
+                  disabled={isLoading}
+                  className="bg-[#fdfcfb] dark:bg-[#2a2a2a] h-[31.996px] rounded-[10px] border border-[#e5dfe8] dark:border-[#333333] px-3 hover:bg-gray-50 dark:hover:bg-[#333333] transition-colors"
+                >
+                  <span className="font-['Inter'] font-medium leading-[20px] text-[#2d3748] dark:text-[#e5e5e5] text-[14px] tracking-[-0.1504px]">
+                    {isLoading ? 'Cargando...' : 'Actualizar'}
+                  </span>
+                </button>
+              </div>
 
-          {/* Pending Requests Tab */}
-          <TabsContent value="pending" className="mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Solicitudes pendientes</CardTitle>
-                <CardDescription>
-                  Personas que aún no han aceptado tu solicitud de acompañamiento
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {isLoading ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    Cargando...
-                  </div>
-                ) : pendingRequests.length === 0 ? (
-                  <div className="text-center py-8 space-y-3">
-                    <Calendar className="w-12 h-12 text-muted-foreground mx-auto" />
-                    <div>
-                      <div className="mb-1">No hay solicitudes pendientes</div>
-                      <p className="text-muted-foreground">
-                        Las personas que invites aparecerán aquí hasta que acepten
-                      </p>
+              {/* Tabs */}
+              <Tabs defaultValue="confirmados" className="w-full">
+                <TabsList className="bg-[#e8f5f1] dark:bg-[#2a2a2a] h-[36px] rounded-[16px] w-full grid grid-cols-3 p-0 mb-8">
+                  <TabsTrigger 
+                    value="confirmados" 
+                    className="rounded-[16px] data-[state=active]:bg-white dark:data-[state=active]:bg-[#1a1a1a] h-[28.999px] mx-[2.98px]"
+                  >
+                    <p className="font-['Inter'] font-medium leading-[20px] text-[#2d3748] dark:text-[#e5e5e5] text-[14px] tracking-[-0.1504px]">
+                      Confirmados ({disciples.length})
+                    </p>
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="pendientes" 
+                    className="rounded-[16px] data-[state=active]:bg-white dark:data-[state=active]:bg-[#1a1a1a] h-[28.999px] mx-[2.98px]"
+                  >
+                    <p className="font-['Inter'] font-medium leading-[20px] text-[#2d3748] dark:text-[#e5e5e5] text-[14px] tracking-[-0.1504px]">
+                      Pendientes ({pendingRequests.length})
+                    </p>
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="disponibles" 
+                    className="rounded-[16px] data-[state=active]:bg-white dark:data-[state=active]:bg-[#1a1a1a] h-[28.999px] mx-[2.98px]"
+                  >
+                    <p className="font-['Inter'] font-medium leading-[20px] text-[#2d3748] dark:text-[#e5e5e5] text-[14px] tracking-[-0.1504px]">
+                      Disponibles ({availableDisciples.length})
+                    </p>
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="confirmados" className="mt-0">
+                  {/* Lista de discípulos */}
+                  {isLoading ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="w-6 h-6 animate-spin text-[#7eb3d5]" />
                     </div>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {pendingRequests.map((disciple) => (
-                      <div
-                        key={disciple.id}
-                        className="flex items-center justify-between p-4 rounded-lg border border-border bg-muted/30"
-                      >
-                        <div className="flex-1">
-                          <div className="mb-1">{disciple.name}</div>
-                          <p className="text-muted-foreground">
-                            {disciple.email}
-                          </p>
-                          <p className="text-muted-foreground mt-1">
-                            Solicitud enviada • Esperando confirmación
-                          </p>
-                        </div>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleUnassignDisciple(disciple.id)}
+                  ) : disciples.length === 0 ? (
+                    <Alert className="border-[#e5dfe8] dark:border-[#333333] dark:bg-[#1a1a1a]">
+                      <AlertDescription className="text-[#5a6c6d] dark:text-[#a3a3a3]">
+                        No tienes discípulos asignados todavía.
+                      </AlertDescription>
+                    </Alert>
+                  ) : (
+                    <div className="space-y-3">
+                      {disciples.map((disciple) => (
+                        <div 
+                          key={disciple.id}
+                          className="h-[113.8px] relative rounded-[12px] border-[0.909px] border-[#e5dfe8] dark:border-[#333333] dark:bg-[#1a1a1a]"
                         >
-                          <UserMinus className="w-4 h-4 mr-2" />
-                          Cancelar
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
+                          <div className="absolute left-[16.9px] top-[16.9px] flex flex-col gap-[3.999px]">
+                            <p className="font-['Inter'] font-normal leading-[24px] text-[#2d3748] dark:text-[#e5e5e5] text-[16px] tracking-[-0.3125px]">
+                              {disciple.name}
+                            </p>
+                            <p className="font-['Inter'] font-normal leading-[24px] text-[#5a6c6d] dark:text-[#a3a3a3] text-[16px] tracking-[-0.3125px]">
+                              {disciple.email}
+                            </p>
+                            <p className="font-['Inter'] font-normal leading-[24px] text-[#5a6c6d] dark:text-[#a3a3a3] text-[16px] tracking-[-0.3125px]">
+                              {formatDate(disciple.created_at)}
+                            </p>
+                          </div>
 
-          {/* Available Disciples Tab */}
-          <TabsContent value="available" className="mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Usuarios disponibles</CardTitle>
-                <CardDescription>
-                  Personas sin líder asignado que puedes acompañar
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {isLoadingAvailable ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    Cargando...
-                  </div>
-                ) : availableDisciples.length === 0 ? (
-                  <div className="text-center py-8 space-y-3">
-                    <UserPlus className="w-12 h-12 text-muted-foreground mx-auto" />
-                    <div>
-                      <div className="mb-1">No hay usuarios disponibles</div>
-                      <p className="text-muted-foreground">
-                        Todos los usuarios ya tienen líder asignado
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {availableDisciples.map((disciple) => (
-                      <div
-                        key={disciple.id}
-                        className="flex items-center justify-between p-4 rounded-lg border border-border hover:border-primary/50 transition-colors"
-                      >
-                        <div className="flex-1">
-                          <div className="mb-1">{disciple.name}</div>
-                          <p className="text-muted-foreground">
-                            {disciple.email}
-                          </p>
-                          <p className="text-muted-foreground mt-1">
-                            Registrado {new Date(disciple.created_at).toLocaleDateString('es-ES', {
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric'
-                            })}
-                          </p>
+                          <div className="absolute flex gap-[7.997px] h-[31.996px] right-[16.9px] top-[40.9px]">
+                            <button
+                              onClick={() => {
+                                console.log('👤 Viewing profile for disciple:', disciple);
+                                setSelectedDisciple(disciple);
+                                setViewMode('profile');
+                              }}
+                              className="bg-[#fdfcfb] dark:bg-[#2a2a2a] h-[31.996px] rounded-[10px] border-[0.909px] border-[#e5dfe8] dark:border-[#333333] px-3 hover:bg-gray-50 dark:hover:bg-[#333333] transition-colors"
+                            >
+                              <div className="flex items-center h-full gap-2">
+                                <User className="size-[15.994px] text-[#2D3748] dark:text-[#e5e5e5]" />
+                                <p className="font-['Inter'] font-medium leading-[20px] text-[#2d3748] dark:text-[#e5e5e5] text-[14px] tracking-[-0.1504px]">
+                                  Ver Perfil
+                                </p>
+                              </div>
+                            </button>
+
+                            <button
+                              onClick={() => {
+                                setSelectedDisciple(disciple);
+                                setViewMode('checkins');
+                              }}
+                              className="bg-[#fdfcfb] dark:bg-[#2a2a2a] h-[31.996px] rounded-[10px] border-[0.909px] border-[#e5dfe8] dark:border-[#333333] px-3 hover:bg-gray-50 dark:hover:bg-[#333333] transition-colors"
+                            >
+                              <div className="flex items-center h-full relative">
+                                <svg className="absolute left-[10.91px] top-[8px] size-[15.994px]" fill="none" preserveAspectRatio="none" viewBox="0 0 16 16">
+                                  <g clipPath="url(#clip0_eye)" id="Icon">
+                                    <path d={svgPaths.p2eb0bf00} stroke="currentColor" className="text-[#2D3748] dark:text-[#e5e5e5]" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.33286" />
+                                    <path d={svgPaths.p1f301500} stroke="currentColor" className="text-[#2D3748] dark:text-[#e5e5e5]" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.33286" />
+                                  </g>
+                                  <defs>
+                                    <clipPath id="clip0_eye">
+                                      <rect fill="white" height="15.9943" width="15.9943" />
+                                    </clipPath>
+                                  </defs>
+                                </svg>
+                                <p className="font-['Inter'] font-medium leading-[20px] text-[#2d3748] dark:text-[#e5e5e5] text-[14px] tracking-[-0.1504px] ml-[30.9px]">
+                                  Ver check-ins
+                                </p>
+                              </div>
+                            </button>
+
+                            <button
+                              onClick={() => handleUnassignDisciple(disciple.id)}
+                              className="bg-[#fdfcfb] dark:bg-[#2a2a2a] h-[31.996px] rounded-[10px] border-[0.909px] border-[#e5dfe8] dark:border-[#333333] px-3 hover:bg-gray-50 dark:hover:bg-[#333333] transition-colors"
+                            >
+                              <div className="flex items-center h-full relative">
+                                <svg className="top-[8px] size-[15.994px]" fill="none" preserveAspectRatio="none" viewBox="0 0 16 16">
+                                  <g clipPath="url(#clip0_unassign)" id="Icon">
+                                    <path d={svgPaths.p15935c00} stroke="currentColor" className="text-[#2D3748] dark:text-[#e5e5e5]" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.33286" />
+                                    <path d={svgPaths.p23a34100} stroke="currentColor" className="text-[#2D3748] dark:text-[#e5e5e5]" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.33286" />
+                                    <path d="M14.6615 7.33073H10.6629" stroke="currentColor" className="text-[#2D3748] dark:text-[#e5e5e5]" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.33286" />
+                                  </g>
+                                  <defs>
+                                    <clipPath id="clip0_unassign">
+                                      <rect fill="white" height="15.9943" width="15.9943" />
+                                    </clipPath>
+                                  </defs>
+                                </svg>
+                          
+                              </div>
+                            </button>
+                          </div>
                         </div>
-                        <Button
-                          variant="default"
-                          size="sm"
-                          onClick={() => handleAssignDisciple(disciple.id)}
+                      ))}
+                    </div>
+                  )}
+                </TabsContent>
+
+                <TabsContent value="pendientes" className="mt-0">
+                  {pendingRequests.length === 0 ? (
+                    <Alert className="border-[#e5dfe8] dark:border-[#333333] dark:bg-[#1a1a1a]">
+                      <AlertDescription className="text-[#5a6c6d] dark:text-[#a3a3a3]">
+                        No hay solicitudes pendientes de confirmación
+                      </AlertDescription>
+                    </Alert>
+                  ) : (
+                    <div className="space-y-3">
+                      {pendingRequests.map((disciple) => (
+                        <div 
+                          key={disciple.id}
+                          className="h-[113.8px] relative rounded-[12px] border-[0.909px] border-[#fbbf24] dark:border-[#d97706] dark:bg-[#1a1a1a]"
                         >
-                          <UserPlus className="w-4 h-4 mr-2" />
-                          Enviar solicitud
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
+                          <div className="absolute left-[16.9px] top-[16.9px] flex flex-col gap-[3.999px]">
+                            <div className="flex items-center gap-2">
+                              <p className="font-['Inter'] font-normal leading-[24px] text-[#2d3748] dark:text-[#e5e5e5] text-[16px] tracking-[-0.3125px]">
+                                {disciple.name}
+                              </p>
+                              <div className="bg-[#fef3c7] dark:bg-[#78350f] h-[21.811px] rounded-[10px] px-2 py-1">
+                                <p className="font-['Inter'] font-medium leading-[16px] text-[#f59e0b] dark:text-[#fbbf24] text-[12px]">
+                                  Pendiente
+                                </p>
+                              </div>
+                            </div>
+                            <p className="font-['Inter'] font-normal leading-[24px] text-[#5a6c6d] dark:text-[#a3a3a3] text-[16px] tracking-[-0.3125px]">
+                              {disciple.email}
+                            </p>
+                            <p className="font-['Inter'] font-normal leading-[24px] text-[#5a6c6d] dark:text-[#a3a3a3] text-[16px] tracking-[-0.3125px]">
+                              Solicitud enviada
+                            </p>
+                          </div>
 
-          {/* Meetings Tab */}
-          <TabsContent value="meetings" className="mt-6">
-            <MeetingScheduler
-              userRole="leader"
-              accessToken={accessToken}
-              projectId={projectId}
-            />
-          </TabsContent>
-        </Tabs>
+                          <div className="absolute flex gap-[7.997px] h-[31.996px] right-[16.9px] top-[40.9px]">
+                            <button
+                              onClick={() => handleCancelRequest(disciple.id)}
+                              className="bg-[#fdfcfb] dark:bg-[#2a2a2a] h-[31.996px] rounded-[10px] border-[0.909px] border-[#e5dfe8] dark:border-[#333333] px-3 hover:bg-gray-50 dark:hover:bg-[#333333] transition-colors"
+                            >
+                              <div className="flex items-center h-full relative">
+                                <svg className="absolute left-[10.91px] top-[8px] size-[15.994px]" fill="none" preserveAspectRatio="none" viewBox="0 0 16 16">
+                                  <g id="Icon">
+                                    <path d="M12.6622 3.33073L3.33216 12.6608" stroke="currentColor" className="text-[#2D3748] dark:text-[#e5e5e5]" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.33286" />
+                                    <path d="M3.33216 3.33073L12.6622 12.6608" stroke="currentColor" className="text-[#2D3748] dark:text-[#e5e5e5]" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.33286" />
+                                  </g>
+                                </svg>
+                                <p className="font-['Inter'] font-medium leading-[20px] text-[#2d3748] dark:text-[#e5e5e5] text-[14px] tracking-[-0.1504px] ml-[30.9px]">
+                                  Cancelar solicitud
+                                </p>
+                              </div>
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </TabsContent>
 
-        {/* Info Card */}
-        <Card>
-          <CardContent className="pt-6">
+                <TabsContent value="disponibles" className="mt-0">
+                  {availableDisciples.length === 0 ? (
+                    <Alert className="border-[#e5dfe8] dark:border-[#333333] dark:bg-[#1a1a1a]">
+                      <AlertDescription className="text-[#5a6c6d] dark:text-[#a3a3a3]">
+                        No hay discípulos disponibles en este momento
+                      </AlertDescription>
+                    </Alert>
+                  ) : (
+                    <div className="space-y-3">
+                      {availableDisciples.map((disciple) => (
+                        <div 
+                          key={disciple.id}
+                          className="h-[113.8px] relative rounded-[12px] border-[0.909px] border-[#e5dfe8] dark:border-[#333333] dark:bg-[#1a1a1a]"
+                        >
+                          <div className="absolute left-[16.9px] top-[16.9px] flex flex-col gap-[3.999px]">
+                            <p className="font-['Inter'] font-normal leading-[24px] text-[#2d3748] dark:text-[#e5e5e5] text-[16px] tracking-[-0.3125px]">
+                              {disciple.name}
+                            </p>
+                            <p className="font-['Inter'] font-normal leading-[24px] text-[#5a6c6d] dark:text-[#a3a3a3] text-[16px] tracking-[-0.3125px]">
+                              {disciple.email}
+                            </p>
+                            <p className="font-['Inter'] font-normal leading-[24px] text-[#5a6c6d] dark:text-[#a3a3a3] text-[16px] tracking-[-0.3125px]">
+                              {formatDate(disciple.created_at)}
+                            </p>
+                          </div>
+
+                          <div className="absolute flex gap-[7.997px] h-[31.996px] right-[16.9px] top-[40.9px]">
+                            <button
+                              onClick={() => handleAssignDisciple(disciple.id)}
+                              className="bg-[#7eb3d5] dark:bg-[#5a8db0] h-[31.996px] rounded-[10px] px-3 hover:bg-[#7eb3d5]/90 dark:hover:bg-[#4a7d9f] transition-colors"
+                            >
+                              <div className="flex items-center h-full relative">
+                                <svg className="absolute left-[10.91px] top-[8px] size-[15.994px]" fill="none" preserveAspectRatio="none" viewBox="0 0 16 16">
+                                  <g clipPath="url(#clip0_assign)" id="Icon">
+                                    <path d={svgPaths.p15935c00} stroke="white" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.33286" />
+                                    <path d={svgPaths.p23a34100} stroke="white" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.33286" />
+                                    <path d="M10.6629 7.33073H14.6615" stroke="white" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.33286" />
+                                    <path d="M12.6622 5.33145V9.33002" stroke="white" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.33286" />
+                                  </g>
+                                  <defs>
+                                    <clipPath id="clip0_assign">
+                                      <rect fill="white" height="15.9943" width="15.9943" />
+                                    </clipPath>
+                                  </defs>
+                                </svg>
+                                <p className="font-['Inter'] font-medium leading-[20px] text-white text-[14px] tracking-[-0.1504px] ml-[30.9px]">
+                                  Enviar solicitud
+                                </p>
+                              </div>
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </TabsContent>
+              </Tabs>
+            </div>
+          </div>
+
+          {/* Card 2: MeetingScheduler (Horarios + Reuniones) */}
+          <MeetingScheduler 
+            userRole="leader"
+            accessToken={accessToken}
+            projectId={projectId}
+          />
+
+          {/* Card 3: Mensaje inspirador */}
+          <div className="bg-[#fdfcfe] dark:bg-[#242424] rounded-[16px] border-[0.909px] border-[#e5dfe8] dark:border-[#333333] p-6">
             <div className="text-center space-y-2">
-              <p className="text-muted-foreground">
-                Como líder, tu rol es acompañar con amor y sin juicio. Recuerda que cada persona 
-                tiene su propio tiempo en el proceso de restauración.
+              <p className="font-['Inter'] font-normal leading-[24px] text-[#5a6c6d] dark:text-[#a3a3a3] text-[16px] tracking-[-0.3125px]">
+                Como líder, tu rol es acompañar con amor y sin juicio. Recuerda que cada persona tiene su propio tiempo en el proceso de restauración.
               </p>
-              <p className="italic text-primary">
+              <p className="font-['Inter'] font-normal italic leading-[24px] text-[#7eb3d5] dark:text-[#8ec5e6] text-[16px] tracking-[-0.3125px]">
                 "El que comenzó en vosotros la buena obra, la perfeccionará" — Filipenses 1:6
               </p>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+
+        </div>
       </div>
     </div>
   );
